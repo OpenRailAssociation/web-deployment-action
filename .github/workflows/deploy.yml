@@ -15,9 +15,6 @@ on:
       ssh_user:
         required: true
         type: string
-      ssh_key:
-        required: true
-        type: string
       ssh_port:
         required: false
         default: "22"
@@ -78,6 +75,9 @@ on:
         required: false
         default: "false"
         type: string
+    secrets:
+      ssh_key:
+        required: true
 
 jobs:
   vars:

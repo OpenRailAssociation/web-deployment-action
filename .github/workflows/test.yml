@@ -36,9 +36,10 @@ jobs:
       domain_preview: web-preview.openrailassociation.org
       ssh_host: uberspace1.openrailassociation.org
       ssh_user: openrail
-      ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
       dir_base: "/var/www/virtual"
       dir_production: "web-deployment-action.openrailassociation.org"
       dir_preview_base: "web-preview.openrailassociation.org"
       dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
       linkchecker_exclude: "example.com,example.org"
+    secrets:
+      ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
