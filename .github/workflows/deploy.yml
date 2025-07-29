@@ -105,7 +105,7 @@ jobs:
       - id: linkchecker_exclude
         run: |
           if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
-            excludes=$(echo "${{ inputs.linkchecker_exclude }}" | sed 's/[^,]*/--exclude &/g')
+            excludes=$(echo "${{ inputs.linkchecker_exclude }}" | sed 's/,/ --exclude /g; s/^/--exclude /')
             echo "linkchecker_exclude=$excludes" >> "$GITHUB_OUTPUT"
           else
             echo "linkchecker_exclude=" >> "$GITHUB_OUTPUT"
@@ -127,7 +127,7 @@ jobs:
         with:
           args: >-
             -r ${{ inputs.linkchecker_retry_times }}
-            -u ${{ inputs.linkchecker_user_agent }}
+            -u "${{ inputs.linkchecker_user_agent }}"
             ${{ needs.vars.outputs.linkchecker_fragments }}
             ${{ needs.vars.outputs.linkchecker_exclude }}
             --max-concurrency ${{ inputs.linkchecker_max_concurrency }} .
