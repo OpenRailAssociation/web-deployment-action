@@ -1,0 +1,84 @@
+name: "Deploy production and preview website"
+description: "Deploys the production and preview website using GitHub Actions to an external webspace (e.g., Uberspace)."
+author: "OpenRail Association"
+
+inputs:
+  artifact_name:
+    description: "The name of the artifact to deploy, e.g. 'website'"
+    required: true
+  domain_preview:
+    description: "The domain for the preview deployment, e.g. 'preview.example.com'"
+    required: true
+  ssh_host:
+    description: "The SSH host for the deployment, e.g. 'ssh.example.com'"
+    required: true
+  ssh_user:
+    description: "The SSH user for the deployment, e.g. 'deploy'"
+    required: true
+  ssh_key:
+    description: "The SSH private key for the deployment, e.g. '${{ secrets.SSH_PRIVATE_KEY }}'"
+    required: true
+  ssh_port:
+    description: "The SSH port for the deployment, e.g. '22'"
+    required: false
+    default: "22"
+  ssh_timeout:
+    description: "The SSH connection timeout in seconds. Defaults to 1m."
+    required: false
+    default: "1m"
+  ssh_command_timeout:
+    description: "The SSH command timeout in seconds. Defaults to 2m."
+    required: false
+    default: "2m"
+  ssh_rm:
+    description: "Whether to remove the remote directory before deployment. Defaults to true."
+    required: false
+    default: "true"
+  ssh_strip_components:
+    description: "The number of leading components to strip from the source directory during deployment. Defaults to 1."
+    required: false
+    default: "1"
+  dir_base:
+    description: "The SSH virtual base directory for all deployments, e.g. '/var/www/'"
+    required: true
+  dir_production:
+    description: "The SSH production directory for the deployment inside $dir_base, e.g. 'html'"
+    required: true
+  dir_preview_base:
+    description: "The base directory for the preview deployment inside $dir_base, e.g. 'preview'"
+    required: true
+  dir_preview_subdir:
+    description: "The segment for the preview deployment inside $dir_preview_base, e.g. 'pr-${{ github.event.number }}'"
+    required: true
+  linkchecker_enabled:
+    description: "Whether to enable the link checker step. Defaults to true."
+    required: false
+    default: "true"
+  linkchecker_exclude:
+    description: "A comma-separated list of URLs to exclude from the link checker. Defaults to an empty string."
+    required: false
+    default: ""
+  linkchecker_include_fragments:
+    description: "Whether to include fragments in the link checker. Defaults to true."
+    required: false
+    default: "true"
+  linkchecker_max_concurrency:
+    description: "The maximum number of concurrent requests for the link checker. Defaults to 1."
+    required: false
+    default: "1"
+  linkchecker_user_agent:
+    description: "The user agent string for the link checker. Defaults to a common browser user agent."
+    required: false
+    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+  linkchecker_retry_times:
+    description: "The time in seconds to wait for a retry for failed links in the link checker. Defaults to 5."
+    required: false
+    default: "5"
+  linkchecker_fail_on_errors:
+    description: "Whether to fail the action on link checker errors. Defaults to false."
+    required: false
+    default: "false"
+
+runs:
+  using: "workflow"
+  main: ".github/workflows/deploy.yml"
