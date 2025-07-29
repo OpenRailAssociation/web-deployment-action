@@ -60,8 +60,8 @@ on:
         type: string
       linkchecker_include_fragments:
         required: false
-        default: "true"
-        type: string
+        default: true
+        type: boolean
       linkchecker_max_concurrency:
         required: false
         default: 1
