@@ -6,6 +6,9 @@ on:
       artifact_name:
         required: true
         type: string
+      condition_production:
+        required: true
+        type: boolean
       domain_preview:
         required: true
         type: string
@@ -17,8 +20,8 @@ on:
         type: string
       ssh_port:
         required: false
-        default: "22"
-        type: string
+        default: 22
+        type: number
       ssh_timeout:
         required: false
         default: "1m"
@@ -29,12 +32,12 @@ on:
         type: string
       ssh_rm:
         required: false
-        default: "true"
-        type: string
+        default: true
+        type: boolean
       ssh_strip_components:
         required: false
-        default: "1"
-        type: string
+        default: 1
+        type: number
       dir_base:
         required: true
         type: string
@@ -49,8 +52,8 @@ on:
         type: string
       linkchecker_enabled:
         required: false
-        default: "true"
-        type: string
+        default: true
+        type: boolean
       linkchecker_exclude:
         required: false
         default: ""
@@ -61,20 +64,20 @@ on:
         type: string
       linkchecker_max_concurrency:
         required: false
-        default: "1"
-        type: string
+        default: 1
+        type: number
       linkchecker_user_agent:
         required: false
         default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
         type: string
       linkchecker_retry_times:
         required: false
-        default: "5"
-        type: string
+        default: 5
+        type: number
       linkchecker_fail_on_errors:
         required: false
-        default: "false"
-        type: string
+        default: false
+        type: boolean
     secrets:
       ssh_key:
         required: true
@@ -138,6 +141,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - vars
+    # Only deploy if production condition is met
+    if: inputs.condition_production
     steps:
       - name: Download artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4

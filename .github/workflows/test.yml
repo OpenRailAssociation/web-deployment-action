@@ -41,5 +41,6 @@ jobs:
       dir_preview_base: "web-preview.openrailassociation.org"
       dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
       linkchecker_exclude: "example.com,example.org"
+      condition_production: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
     secrets:
       ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
