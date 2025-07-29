@@ -1,0 +1,46 @@
+name: Test Deploy Action
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Website (Placeholder)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build website
+        run: |
+          echo "Simulating build..."
+          mkdir -p dist
+          echo "<html><body><p>Hello world: <a href="https://openrailassociation.org">LINK</a></p><p>${{ github.head_ref }}.${{ github.event.pull_request.head.sha }}</p></body></html>" > dist/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: website
+          path: dist
+
+  deploy:
+    name: Call Reusable Deploy Workflow
+    needs: build
+    uses: ./.github/workflows/deploy.yml
+    with:
+      artifact_name: website
+      domain_preview: web-preview.openrailassociation.org
+      ssh_host: uberspace1.openrailassociation.org
+      ssh_user: openrail
+      dir_base: "/var/www/virtual/openrail"
+      dir_production: "web-deployment-action.openrailassociation.org"
+      dir_preview_base: "web-preview.openrailassociation.org"
+      dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
+      linkchecker_exclude: "example.com,example.org"
+      condition_production: ${{ github.ref == 'refs/heads/main' }}
+    secrets:
+      ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
