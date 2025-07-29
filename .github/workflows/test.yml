@@ -47,5 +47,7 @@ jobs:
       dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
       linkchecker_exclude: "example.com,example.org"
       condition_production: ${{ github.ref == 'refs/heads/main' }}
+      sticky_comment_enabled: false
+      linkchecker_enabled: false
     secrets:
       ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
