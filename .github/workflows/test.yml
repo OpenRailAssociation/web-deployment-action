@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Simulating build..."
           mkdir -p dist
-          echo "<html><body>Hello world</body></html>" > dist/index.html
+          echo "<html><body>Hello world: <a href="https://openrailassociation.org">LINK</a></body></html>" > dist/index.html
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
