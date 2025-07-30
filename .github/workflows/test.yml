@@ -33,7 +33,7 @@ jobs:
           path: dist
 
   deploy:
-    name: Call Reusable Deploy Workflow
+    name: Web Deployment
     needs: build
     uses: ./.github/workflows/deploy.yml
     with:
