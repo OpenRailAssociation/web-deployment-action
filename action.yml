@@ -6,6 +6,9 @@ inputs:
   artifact_name:
     description: "The name of the artifact to deploy, e.g. 'website'"
     required: true
+  domain_production:
+    description: "The domain for the production deployment, e.g. 'example.com'. Only needed for detailed step summary."
+    required: false
   domain_preview:
     description: "The domain for the preview deployment, e.g. 'preview.example.com'"
     required: true
@@ -78,6 +81,14 @@ inputs:
     description: "Whether to fail the action on link checker errors. Defaults to false."
     required: false
     default: "false"
+  sticky_comment_enabled:
+    description: "Whether to enable sticky comments for the pull request. Defaults to true."
+    required: false
+    default: true
+  step_summary_enabled:
+    description: "Whether to enable step summaries in the GitHub Actions UI. Defaults to true."
+    required: false
+    default: true
 
 runs:
   using: "workflow"
