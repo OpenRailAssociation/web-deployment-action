@@ -177,7 +177,9 @@ jobs:
 
       - name: Add step summary
         if: inputs.step_summary_enabled == true
-        run: echo "### Summary\nDeployed website to production ${{ inputs.domain_production }}" >> $GITHUB_STEP_SUMMARY
+        run: |
+          SUMMARY=$'# Website Deployment Summary\nDeployed website to production ${{ inputs.domain_production }}'
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
   deploy-preview:
     runs-on: ubuntu-24.04
@@ -219,7 +221,9 @@ jobs:
 
       - name: Add step summary
         if: inputs.step_summary_enabled == true
-        run: echo "### Summary\nDeployed preview website to https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_STEP_SUMMARY
+        run: |
+          SUMMARY=$'# Website Deployment Summary\nDeployed preview website to https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}'
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
   remove-preview:
     runs-on: ubuntu-24.04
@@ -257,4 +261,6 @@ jobs:
 
       - name: Add step summary
         if: inputs.step_summary_enabled == true
-        run: echo "### Summary\nRemoved preview" >> $GITHUB_STEP_SUMMARY
+        run: |
+          SUMMARY=$'# Website Deployment Summary\nRemoved preview website at https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}'
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
