@@ -54,6 +54,10 @@ on:
         required: false
         default: true
         type: boolean
+      production_to_ghpages:
+        required: false
+        default: false
+        type: boolean
       linkchecker_exclude:
         required: false
         default: ""
@@ -156,6 +160,7 @@ jobs:
 
       - name: Copy website to host
         uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1.0.0
+        if: inputs.production_to_ghpages == false
         with:
           host: ${{ inputs.ssh_host }}
           username: ${{ inputs.ssh_user }}
@@ -167,6 +172,17 @@ jobs:
           source: "${{ inputs.artifact_name }}/*"
           rm: ${{ inputs.ssh_rm }}
           strip_components: ${{ inputs.ssh_strip_components }}
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
+        if: inputs.production_to_ghpages == true
+        with:
+          path: ./${{ inputs.artifact_name }}
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+        if: inputs.production_to_ghpages == true
 
   deploy-preview:
     runs-on: ubuntu-24.04

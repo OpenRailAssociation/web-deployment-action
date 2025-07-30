@@ -50,6 +50,10 @@ inputs:
   dir_preview_subdir:
     description: "The segment for the preview deployment inside $dir_preview_base, e.g. 'pr-${{ github.event.number }}'"
     required: true
+  production_to_ghpages:
+    description: "Whether to deploy the production website to GitHub Pages. Defaults to false."
+    required: false
+    default: false
   linkchecker_enabled:
     description: "Whether to enable the link checker step. Defaults to true."
     required: false
