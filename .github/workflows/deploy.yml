@@ -145,8 +145,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - vars
-    # Only deploy if production condition is met
-    if: inputs.condition_production
+    # Only deploy if production condition is met and not a closed/merged pull request
+    if: inputs.condition_production && (needs.vars.outputs.pr_closed_merged == '' || needs.vars.outputs.pr_closed_merged == 'false')
     steps:
       - name: Download artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
