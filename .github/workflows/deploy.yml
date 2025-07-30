@@ -9,6 +9,9 @@ on:
       condition_production:
         required: true
         type: boolean
+      domain_production:
+        required: false
+        type: string
       domain_preview:
         required: true
         type: string
@@ -79,6 +82,10 @@ on:
         default: false
         type: boolean
       sticky_comment_enabled:
+        required: false
+        default: true
+        type: boolean
+      step_summary_enabled:
         required: false
         default: true
         type: boolean
@@ -168,6 +175,10 @@ jobs:
           rm: ${{ inputs.ssh_rm }}
           strip_components: ${{ inputs.ssh_strip_components }}
 
+      - name: Add step summary
+        if: inputs.step_summary_enabled == true
+        run: echo "### Summary\nDeployed website to production ${{ inputs.domain_production }}" >> $GITHUB_STEP_SUMMARY
+
   deploy-preview:
     runs-on: ubuntu-24.04
     needs:
@@ -206,6 +217,10 @@ jobs:
             | <p><br />:rocket: View preview at <br />https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}/<br /><br /></p>
             | <p>Last updated: ${{ needs.vars.outputs.datetime }}</p>
 
+      - name: Add step summary
+        if: inputs.step_summary_enabled == true
+        run: echo "### Summary\nDeployed preview website to https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_STEP_SUMMARY
+
   remove-preview:
     runs-on: ubuntu-24.04
     needs:
@@ -239,3 +254,7 @@ jobs:
             Pull Request Live Preview
             :---:
             | <p><br />:x: Preview has been removed.<br /><br /></p>
+
+      - name: Add step summary
+        if: inputs.step_summary_enabled == true
+        run: echo "### Summary\nRemoved preview" >> $GITHUB_STEP_SUMMARY
