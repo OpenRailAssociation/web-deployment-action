@@ -1,94 +1,132 @@
+# SPDX-FileCopyrightText: 2025 DB Systel GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: "Deploy production and preview website"
-description: "Deploys the production and preview website using GitHub Actions to an external webspace (e.g., Uberspace)."
+description: "Deploys a built website artifact to a production and preview environment via SSH, with optional link checking."
 author: "OpenRail Association"
+branding:
+  icon: upload-cloud
+  color: purple
 
 inputs:
   artifact_name:
-    description: "The name of the artifact to deploy, e.g. 'website'"
+    description: "The name of the uploaded artifact to deploy."
     required: true
+
   domain_production:
-    description: "The domain for the production deployment, e.g. 'example.com'. Only needed for detailed step summary."
+    description: "Domain name for the production deployment, e.g. https://example.com"
     required: false
+
   domain_preview:
-    description: "The domain for the preview deployment, e.g. 'preview.example.com'"
+    description: "Domain name for the preview deployment, e.g. https://preview.example.com"
     required: true
+
   ssh_host:
-    description: "The SSH host for the deployment, e.g. 'ssh.example.com'"
+    description: "SSH hostname (e.g. webspace.example.org)"
     required: true
+
   ssh_user:
-    description: "The SSH user for the deployment, e.g. 'deploy'"
+    description: "SSH username"
     required: true
-  ssh_key:
-    description: "The SSH private key for the deployment, e.g. '${{ secrets.SSH_PRIVATE_KEY }}'"
-    required: true
+
   ssh_port:
-    description: "The SSH port for the deployment, e.g. '22'"
+    description: "SSH port"
     required: false
     default: "22"
+
   ssh_timeout:
-    description: "The SSH connection timeout in seconds. Defaults to 1m."
+    description: "SSH connection timeout (e.g. 1m)"
     required: false
     default: "1m"
+
   ssh_command_timeout:
-    description: "The SSH command timeout in seconds. Defaults to 2m."
+    description: "SSH command timeout (e.g. 2m)"
     required: false
     default: "2m"
+
   ssh_rm:
-    description: "Whether to remove the remote directory before deployment. Defaults to true."
+    description: "Remove remote directory before deploying (true/false)"
     required: false
     default: "true"
+
   ssh_strip_components:
-    description: "The number of leading components to strip from the source directory during deployment. Defaults to 1."
+    description: "How many path components to strip (for tar/scp unpacking)"
     required: false
     default: "1"
+
   dir_base:
-    description: "The SSH virtual base directory for all deployments, e.g. '/var/www/'"
+    description: "Remote base directory (e.g. /var/www/virtual)"
     required: true
+
   dir_production:
-    description: "The SSH production directory for the deployment inside $dir_base, e.g. 'html'"
+    description: "Full path for production deployment"
     required: true
+
   dir_preview_base:
-    description: "The base directory for the preview deployment inside $dir_base, e.g. 'preview'"
+    description: "Preview base domain (e.g. preview)"
     required: true
+
   dir_preview_subdir:
-    description: "The segment for the preview deployment inside $dir_preview_base, e.g. 'pr-${{ github.event.number }}'"
+    description: "Preview subdir (e.g. pr-123)"
     required: true
+
   linkchecker_enabled:
-    description: "Whether to enable the link checker step. Defaults to true."
+    description: "Enable link checker (true/false)"
     required: false
     default: "true"
+
   linkchecker_exclude:
-    description: "A comma-separated list of URLs to exclude from the link checker. Defaults to an empty string."
+    description: "Comma-separated list of domains to exclude from link checker"
     required: false
     default: ""
+
   linkchecker_include_fragments:
-    description: "Whether to include fragments in the link checker. Defaults to true."
+    description: "Include anchor fragments in link checking"
     required: false
     default: "true"
+
   linkchecker_max_concurrency:
-    description: "The maximum number of concurrent requests for the link checker. Defaults to 1."
+    description: "Max concurrent requests for link checker"
     required: false
     default: "1"
+
   linkchecker_user_agent:
-    description: "The user agent string for the link checker. Defaults to a common browser user agent."
+    description: "User-Agent for link checking"
     required: false
-    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
+
   linkchecker_retry_times:
-    description: "The time in seconds to wait for a retry for failed links in the link checker. Defaults to 5."
+    description: "Retry delay in seconds for link checking"
     required: false
     default: "5"
+
   linkchecker_fail_on_errors:
-    description: "Whether to fail the action on link checker errors. Defaults to false."
+    description: "Fail workflow on link check errors (true/false)"
     required: false
     default: "false"
+
   sticky_comment_enabled:
     description: "Whether to enable sticky comments for the pull request. Defaults to true."
     required: false
-    default: true
+    default: "true"
+
   step_summary_enabled:
     description: "Whether to enable step summaries in the GitHub Actions UI. Defaults to true."
     required: false
-    default: true
+    default: "true"
+
+secrets:
+  ssh_key:
+    description: "SSH private key for authenticating with the deployment server"
+    required: true
+
+outputs:
+  production_url:
+    description: "The URL of the deployed production website"
+
+  preview_url:
+    description: "The URL of the deployed preview website"
 
 runs:
   using: "workflow"
