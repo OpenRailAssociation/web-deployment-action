@@ -160,7 +160,9 @@ jobs:
             -u "${{ inputs.linkchecker_user_agent }}"
             ${{ needs.vars.outputs.linkchecker_fragments }}
             ${{ needs.vars.outputs.linkchecker_exclude }}
-            --max-concurrency ${{ inputs.linkchecker_max_concurrency }} .
+            --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
+            --root-dir ${{ github.workspace }}
+            .
           fail: ${{ inputs.linkchecker_fail_on_errors }}
 
   # Deployment jobs
