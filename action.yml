@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-name: "Deploy production and preview website"
+name: "Website Preview and Deployment via SSH"
 description: "Deploys a built website artifact to a production and preview environment via SSH, with optional link checking."
 author: "OpenRail Association"
 branding:
