@@ -22,9 +22,11 @@ You can define which conditions have to be met in order to start a productive de
 ## Usage
 
 ```yaml
-name: Deploy Website
+name: Preview and deploy Website
 
 on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
   push:
     branches: [main]
 
