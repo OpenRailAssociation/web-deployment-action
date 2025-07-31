@@ -47,7 +47,7 @@ jobs:
 
   deploy:
     needs: build
-    uses: openrail/web-deployment-action@v1
+    uses: OpenRailAssociation/web-deployment-action@v1
     with:
       artifact_name: website
       domain_production: example.com
