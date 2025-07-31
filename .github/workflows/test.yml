@@ -28,7 +28,11 @@ jobs:
         run: |
           echo "Simulating build..."
           mkdir -p dist
-          echo "<html><body><p>Hello world: <a href="https://openrailassociation.org">LINK</a></p><p>${{ github.ref }}.${{ github.event.pull_request.head.sha }}</p></body></html>" > dist/index.html
+          echo "<html><body>
+          <p>Hello world: <a href="https://openrailassociation.org">LINK 1</a></p>
+          <p>Don't linkcheck me: <a href="https://example.com">LINK 2</a></p>
+          <p>${{ github.ref }}.${{ github.event.pull_request.head.sha }}</p>
+          </body></html>" > dist/index.html
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -42,7 +46,8 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       artifact_name: website
-      domain_preview: web-preview.openrailassociation.org
+      domain_production: https://web-deployment-action.openrailassociation.org
+      domain_preview: https://web-preview.openrailassociation.org
       ssh_host: uberspace1.openrailassociation.org
       ssh_user: openrail
       dir_base: "/var/www/virtual/openrail"
