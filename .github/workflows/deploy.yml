@@ -42,9 +42,6 @@ on:
       ssh_user:
         required: true
         type: string
-      ssh_key:
-        required: true
-        type: string
       ssh_port:
         required: false
         default: 22
@@ -101,6 +98,9 @@ on:
         required: false
         default: true
         type: boolean
+    secrets:
+      ssh_key:
+        required: true
     outputs:
       production_url:
         description: "The URL of the deployed production website"
@@ -186,7 +186,7 @@ jobs:
         with:
           host: ${{ inputs.ssh_host }}
           username: ${{ inputs.ssh_user }}
-          key: ${{ inputs.ssh_key }}
+          key: ${{ secrets.ssh_key }}
           port: ${{ inputs.ssh_port }}
           timeout: ${{ inputs.ssh_timeout }}
           command_timeout: ${{ inputs.ssh_command_timeout }}
