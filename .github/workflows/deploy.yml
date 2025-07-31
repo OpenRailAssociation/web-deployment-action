@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# This is the core of the action with all the inputs and logic for deploying a website.
+# It can be called from other workflows or used directly in a workflow file.
+# It handles both production and preview deployments, including link checking and sticky comments.
+# It also supports removing the preview when a pull request is closed or merged.
+
 name: Deploy Production and Preview
 
 on:
