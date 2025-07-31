@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 DB Systel GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: "Deploy production and preview website"
 description: "Deploys a built website artifact to a production and preview environment via SSH, with optional link checking."
 author: "OpenRail Association"
@@ -10,12 +14,16 @@ inputs:
     description: "The name of the uploaded artifact to deploy."
     required: true
 
+  domain_production:
+    description: "Domain name for the production deployment, e.g. https://example.com"
+    required: false
+
   domain_preview:
-    description: "Domain name for the preview deployment."
+    description: "Domain name for the preview deployment, e.g. https://preview.example.com"
     required: true
 
   ssh_host:
-    description: "SSH hostname (e.g. uberspace1.example.org)"
+    description: "SSH hostname (e.g. webspace.example.org)"
     required: true
 
   ssh_user:
@@ -56,7 +64,7 @@ inputs:
     required: true
 
   dir_preview_base:
-    description: "Preview base domain (e.g. preview.example.com)"
+    description: "Preview base domain (e.g. preview)"
     required: true
 
   dir_preview_subdir:
@@ -107,6 +115,18 @@ inputs:
     description: "Whether to enable step summaries in the GitHub Actions UI. Defaults to true."
     required: false
     default: "true"
+
+secrets:
+  ssh_key:
+    description: "SSH private key for authenticating with the deployment server"
+    required: true
+
+outputs:
+  production_url:
+    description: "The URL of the deployed production website"
+
+  preview_url:
+    description: "The URL of the deployed preview website"
 
 runs:
   using: "workflow"

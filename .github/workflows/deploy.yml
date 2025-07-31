@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 DB Systel GmbH
+#
+# SPDX-License-Identifier: Apache-2.0
+
 name: Deploy Production and Preview
 
 on:
@@ -92,6 +96,13 @@ on:
     secrets:
       ssh_key:
         required: true
+    outputs:
+      production_url:
+        description: "The URL of the deployed production website"
+        value: ${{ jobs.deploy-production.outputs.production_url }}
+      preview_url:
+        description: "The URL of the deployed preview website"
+        value: ${{ jobs.deploy-preview.outputs.preview_url }}
 
 jobs:
   vars:
@@ -152,6 +163,10 @@ jobs:
     runs-on: ubuntu-24.04
     needs:
       - vars
+    outputs:
+      production_url: ${{ steps.send_url.outputs.production_url }}
+    env:
+      url: ${{ inputs.domain_production }}
     # Only deploy if production condition is met and not a closed/merged pull request
     if: inputs.condition_production && (needs.vars.outputs.pr_closed_merged == '' || needs.vars.outputs.pr_closed_merged == 'false')
     steps:
@@ -178,13 +193,21 @@ jobs:
       - name: Add step summary
         if: inputs.step_summary_enabled == true
         run: |
-          SUMMARY=$'# Website Deployment Summary\nDeployed website to production ${{ inputs.domain_production }}'
+          SUMMARY=$'# Website Deployment Summary\nDeployed website to production ${{ env.url }}'
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send URL to output
+        id: send_url
+        run: echo "production_url=${{ env.url }}" >> $GITHUB_OUTPUT
 
   deploy-preview:
     runs-on: ubuntu-24.04
     needs:
       - vars
+    outputs:
+      preview_url: ${{ steps.send_url.outputs.preview_url }}
+    env:
+      url: ${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}
     # Only deploy if non-closed/non-merged pull request
     if: github.event.pull_request && needs.vars.outputs.pr_closed_merged == 'false'
     steps:
@@ -216,19 +239,25 @@ jobs:
           message: |
             Pull Request Live Preview
             :---:
-            | <p><br />:rocket: View preview at <br />https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}/<br /><br /></p>
+            | <p><br />:rocket: View preview at <br />${{ env.url }}/<br /><br /></p>
             | <p>Last updated: ${{ needs.vars.outputs.datetime }}</p>
 
       - name: Add step summary
         if: inputs.step_summary_enabled == true
         run: |
-          SUMMARY=$'# Website Deployment Summary\nDeployed preview website to https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}'
+          SUMMARY=$'# Website Deployment Summary\nDeployed preview website to ${{ env.url }}'
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+      - name: Send URL to output
+        id: send_url
+        run: echo "preview_url=${{ env.url }}" >> $GITHUB_OUTPUT
 
   remove-preview:
     runs-on: ubuntu-24.04
     needs:
       - vars
+    env:
+      url: ${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}
     # Only deploy if non-closed/non-merged pull request
     if: github.event.pull_request && needs.vars.outputs.pr_closed_merged != 'false'
     steps:
@@ -262,5 +291,5 @@ jobs:
       - name: Add step summary
         if: inputs.step_summary_enabled == true
         run: |
-          SUMMARY=$'# Website Deployment Summary\nRemoved preview website at https://${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}'
+          SUMMARY=$'# Website Deployment Summary\nRemoved preview website at ${{ env.url }}'
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
