@@ -14,12 +14,32 @@ inputs:
     description: "The name of the uploaded artifact to deploy."
     required: true
 
+  condition_production:
+    description: "Condition to deploy to production (e.g. `${{ github.ref == 'refs/heads/main' }}`)"
+    required: true
+
   domain_production:
     description: "Domain name for the production deployment, e.g. https://example.com"
-    required: false
+    required: true
 
   domain_preview:
     description: "Domain name for the preview deployment, e.g. https://preview.example.com"
+    required: true
+
+  dir_base:
+    description: "Remote base directory (e.g. /var/www/virtual)"
+    required: true
+
+  dir_production:
+    description: "Full path for production deployment"
+    required: true
+
+  dir_preview_base:
+    description: "Preview base domain (e.g. preview)"
+    required: true
+
+  dir_preview_subdir:
+    description: "Preview subdir (e.g. pr-123)"
     required: true
 
   ssh_host:
@@ -54,22 +74,6 @@ inputs:
     description: "How many path components to strip (for tar/scp unpacking)"
     required: false
     default: "1"
-
-  dir_base:
-    description: "Remote base directory (e.g. /var/www/virtual)"
-    required: true
-
-  dir_production:
-    description: "Full path for production deployment"
-    required: true
-
-  dir_preview_base:
-    description: "Preview base domain (e.g. preview)"
-    required: true
-
-  dir_preview_subdir:
-    description: "Preview subdir (e.g. pr-123)"
-    required: true
 
   linkchecker_enabled:
     description: "Enable link checker (true/false)"
@@ -129,5 +133,32 @@ outputs:
     description: "The URL of the deployed preview website"
 
 runs:
-  using: "workflow"
-  main: ".github/workflows/deploy.yml"
+  using: "composite"
+  steps:
+    - uses: ./.github/workflows/deploy.yml
+      with:
+        artifact_name: ${{ inputs.artifact_name }}
+        condition_production: ${{ inputs.condition_production }}
+        domain_production: ${{ inputs.domain_production }}
+        domain_preview: ${{ inputs.domain_preview }}
+        dir_base: ${{ inputs.dir_base }}
+        dir_production: ${{ inputs.dir_production }}
+        dir_preview_base: ${{ inputs.dir_preview_base }}
+        dir_preview_subdir: ${{ inputs.dir_preview_subdir }}
+        ssh_host: ${{ inputs.ssh_host }}
+        ssh_user: ${{ inputs.ssh_user }}
+        ssh_key: ${{ secrets.ssh_key }}
+        ssh_port: ${{ inputs.ssh_port }}
+        ssh_timeout: ${{ inputs.ssh_timeout }}
+        ssh_command_timeout: ${{ inputs.ssh_command_timeout }}
+        ssh_rm: ${{ inputs.ssh_rm }}
+        ssh_strip_components: ${{ inputs.ssh_strip_components }}
+        linkchecker_enabled: ${{ inputs.linkchecker_enabled }}
+        linkchecker_exclude: ${{ inputs.linkchecker_exclude }}
+        linkchecker_include_fragments: ${{ inputs.linkchecker_include_fragments }}
+        linkchecker_max_concurrency: ${{ inputs.linkchecker_max_concurrency }}
+        linkchecker_user_agent: ${{ inputs.linkchecker_user_agent }}
+        linkchecker_retry_times: ${{ inputs.linkchecker_retry_times }}
+        linkchecker_fail_on_errors: ${{ inputs.linkchecker_fail_on_errors }}
+        sticky_comment_enabled: ${{ inputs.sticky_comment_enabled }}
+        step_summary_enabled: ${{ inputs.step_summary_enabled }}

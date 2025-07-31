@@ -25,10 +25,19 @@ You can define which conditions have to be met in order to start a productive de
 name: Preview and deploy Website
 
 on:
-  pull_request:
-    types: [opened, reopened, synchronize, closed]
+  # Pushes to your main branch, triggering
   push:
     branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+  # Allows to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Allow only one concurrent deployment. However, do NOT cancel in-progress runs as we want to allow
+# especially production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -73,8 +82,13 @@ jobs:
 | name | description | required | default |
 | --- | --- | --- | --- |
 | `artifact_name` | <p>The name of the uploaded artifact to deploy.</p> | `true` | `""` |
-| `domain_production` | <p>Domain name for the production deployment, e.g. https://example.com</p> | `false` | `""` |
+| `condition_production` | <p>Condition to deploy to production (e.g. <code>${{ github.ref == 'refs/heads/main' }}</code>)</p> | `true` | `""` |
+| `domain_production` | <p>Domain name for the production deployment, e.g. https://example.com</p> | `true` | `""` |
 | `domain_preview` | <p>Domain name for the preview deployment, e.g. https://preview.example.com</p> | `true` | `""` |
+| `dir_base` | <p>Remote base directory (e.g. /var/www/virtual)</p> | `true` | `""` |
+| `dir_production` | <p>Full path for production deployment</p> | `true` | `""` |
+| `dir_preview_base` | <p>Preview base domain (e.g. preview)</p> | `true` | `""` |
+| `dir_preview_subdir` | <p>Preview subdir (e.g. pr-123)</p> | `true` | `""` |
 | `ssh_host` | <p>SSH hostname (e.g. webspace.example.org)</p> | `true` | `""` |
 | `ssh_user` | <p>SSH username</p> | `true` | `""` |
 | `ssh_port` | <p>SSH port</p> | `false` | `22` |
@@ -82,10 +96,6 @@ jobs:
 | `ssh_command_timeout` | <p>SSH command timeout (e.g. 2m)</p> | `false` | `2m` |
 | `ssh_rm` | <p>Remove remote directory before deploying (true/false)</p> | `false` | `true` |
 | `ssh_strip_components` | <p>How many path components to strip (for tar/scp unpacking)</p> | `false` | `1` |
-| `dir_base` | <p>Remote base directory (e.g. /var/www/virtual)</p> | `true` | `""` |
-| `dir_production` | <p>Full path for production deployment</p> | `true` | `""` |
-| `dir_preview_base` | <p>Preview base domain (e.g. preview)</p> | `true` | `""` |
-| `dir_preview_subdir` | <p>Preview subdir (e.g. pr-123)</p> | `true` | `""` |
 | `linkchecker_enabled` | <p>Enable link checker (true/false)</p> | `false` | `true` |
 | `linkchecker_exclude` | <p>Comma-separated list of domains to exclude from link checker</p> | `false` | `""` |
 | `linkchecker_include_fragments` | <p>Include anchor fragments in link checking</p> | `false` | `true` |
@@ -117,7 +127,7 @@ jobs:
 <!-- action-docs-runs source="action.yml" -->
 ## Runs
 
-This action is a `workflow` action.
+This action is a `composite` action.
 <!-- action-docs-runs source="action.yml" -->
 
 ## Development and Contribution
