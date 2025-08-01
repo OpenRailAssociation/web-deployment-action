@@ -16,6 +16,11 @@ on:
     branches:
       - main
 
+env:
+  ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+  dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
+  condition_production: ${{ github.ref == 'refs/heads/main' }}
+
 jobs:
   build:
     name: Build Website (Placeholder)
@@ -57,10 +62,10 @@ jobs:
           domain_preview: https://web-preview.openrailassociation.org
           ssh_host: uberspace1.openrailassociation.org
           ssh_user: openrail
-          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_key: ${{ env.ssh_key }}
           dir_base: "/var/www/virtual/openrail"
           dir_production: "web-deployment-action.openrailassociation.org"
           dir_preview_base: "web-preview.openrailassociation.org"
-          dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
+          dir_preview_subdir: ${{ env.dir_preview_subdir }}
           linkchecker_exclude: "example.com,example.org"
-          condition_production: ${{ github.ref == 'refs/heads/main' }}
+          condition_production: ${{ env.condition_production }}
