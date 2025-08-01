@@ -158,6 +158,16 @@ runs:
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}/" >> $GITHUB_ENV
         fi
 
+    - name: Test env setting
+      run: |
+        echo "TEST=${{ env.TEST }}"
+        echo "is_production=${{ env.is_production }}"
+        echo "pr_closed_merged=${{ env.pr_closed_merged }}"
+        echo "datetime=${{ env.datetime }}"
+        echo "linkchecker_fragments=${{ env.linkchecker_fragments }}"
+        echo "linkchecker_verbose=${{ env.linkchecker_verbose }}"
+        echo "linkchecker_exclude=${{ env.linkchecker_exclude }}"
+
     - name: Download Artifact
       uses: actions/download-artifact@v4
       if: inputs.condition_production
