@@ -15,7 +15,7 @@ inputs:
     required: true
 
   condition_production:
-    description: "Condition to deploy to production (e.g. `${{ github.ref == 'refs/heads/main' }}`)"
+    description: "Condition to deploy to production (e.g. `FIXME`)"
     required: true
 
   domain_production:
