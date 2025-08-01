@@ -90,6 +90,10 @@ on:
         required: false
         default: false
         type: boolean
+      linkchecker_verbose:
+        required: false
+        default: false
+        type: boolean
       sticky_comment_enabled:
         required: false
         default: true
@@ -117,6 +121,7 @@ jobs:
       datetime: ${{ steps.datetime.outputs.datetime }}
       linkchecker_fragments: ${{ steps.linkchecker_fragments.outputs.linkchecker_fragments }}
       linkchecker_exclude: ${{ steps.linkchecker_exclude.outputs.linkchecker_exclude }}
+      linkchecker_verbose: ${{ steps.linkchecker_verbose.outputs.linkchecker_verbose }}
     steps:
       - id: pr_status
         run: echo "pr_closed_merged=${{ github.event.pull_request.closed_at || github.event.pull_request.merged }}" >> "$GITHUB_OUTPUT"
@@ -130,6 +135,14 @@ jobs:
             echo "linkchecker_fragments=--include-fragments" >> "$GITHUB_OUTPUT"
           else
             echo "linkchecker_fragments=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - id: linkchecker_verbose
+        run: |
+          if [ "${{ inputs.linkchecker_verbose }}" == 'true' ]; then
+            echo "linkchecker_verbose=--verbose" >> "$GITHUB_OUTPUT"
+          else
+            echo "linkchecker_verbose=" >> "$GITHUB_OUTPUT"
           fi
 
       - id: linkchecker_exclude
@@ -168,6 +181,7 @@ jobs:
             -u "${{ inputs.linkchecker_user_agent }}"
             ${{ needs.vars.outputs.linkchecker_fragments }}
             ${{ needs.vars.outputs.linkchecker_exclude }}
+            ${{ needs.vars.outputs.linkchecker_verbose }}
             --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
             --root-dir ${{ github.workspace }}
             .

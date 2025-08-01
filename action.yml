@@ -110,6 +110,11 @@ inputs:
     required: false
     default: "false"
 
+  linkchecker_verbose:
+    description: "Turn on verbose linkchecker logging in action logs (true/false)"
+    required: false
+    default: "false"
+
   sticky_comment_enabled:
     description: "Whether to enable sticky comments for the pull request. Defaults to true."
     required: false

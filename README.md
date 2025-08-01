@@ -103,6 +103,7 @@ jobs:
 | `linkchecker_user_agent` | <p>User-Agent for link checking</p> | `false` | `Mozilla/5.0 (Windows NT 10.0; Win64; x64)...` |
 | `linkchecker_retry_times` | <p>Retry delay in seconds for link checking</p> | `false` | `5` |
 | `linkchecker_fail_on_errors` | <p>Fail workflow on link check errors (true/false)</p> | `false` | `false` |
+| `linkchecker_verbose` | <p>Turn on verbose linkchecker logging in action logs (true/false)</p> | `false` | `false` |
 | `sticky_comment_enabled` | <p>Whether to enable sticky comments for the pull request. Defaults to true.</p> | `false` | `true` |
 | `step_summary_enabled` | <p>Whether to enable step summaries in the GitHub Actions UI. Defaults to true.</p> | `false` | `true` |
 <!-- action-docs-inputs source="action.yml" -->
@@ -127,7 +128,7 @@ jobs:
 <!-- action-docs-runs source="action.yml" -->
 ## Runs
 
-This action is a `composite` action.
+This action is a `workflow` action.
 <!-- action-docs-runs source="action.yml" -->
 
 ## Development and Contribution
