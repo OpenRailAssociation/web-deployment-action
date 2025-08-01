@@ -94,6 +94,11 @@ inputs:
     required: false
     default: "true"
 
+  linkchecker_offline:
+    description: "Only check local/relative links, do not fetch remote links (true/false)"
+    required: false
+    default: "false"
+
   linkchecker_max_concurrency:
     description: "Max concurrent requests for link checker"
     required: false
@@ -179,6 +184,11 @@ runs:
         else
           echo "LINKCHECKER_FRAGMENTS=" >> $GITHUB_ENV
         fi
+        if ${{ inputs.linkchecker_offline }}; then
+          echo "LINKCHECKER_OFFLINE=--offline" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_OFFLINE=" >> $GITHUB_ENV
+        fi
         if ${{ inputs.linkchecker_verbose }}; then
           echo "LINKCHECKER_VERBOSE=--verbose" >> $GITHUB_ENV
         else
@@ -217,6 +227,7 @@ runs:
           -r ${{ inputs.linkchecker_retry_times }}
           -u "${{ inputs.linkchecker_user_agent }}"
           ${{ env.LINKCHECKER_FRAGMENTS }}
+          ${{ env.LINKCHECKER_OFFLINE }}
           ${{ env.LINKCHECKER_EXCLUDE }}
           ${{ env.LINKCHECKER_VERBOSE }}
           --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
