@@ -48,7 +48,7 @@ jobs:
       - name: Build Website
         run: |
           mkdir -p dist && echo "<html>Hello</html>" > dist/index.html
-      # Artifact has to be uploaded, using `artifact_name` as name
+      # Artifact has to be uploaded. `name` has to be the action's input `artifact_name`
       - uses: actions/upload-artifact@v4
         with:
           name: website
