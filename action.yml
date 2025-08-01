@@ -247,7 +247,7 @@ runs:
       with:
         host: ${{ inputs.ssh_host }}
         username: ${{ inputs.ssh_user }}
-        key: ${{ env.ssh_key }}
+        key: ${{ inputs.ssh_key }}
         port: ${{ inputs.ssh_port }}
         timeout: ${{ inputs.ssh_timeout }}
         command_timeout: ${{ inputs.ssh_command_timeout }}
