@@ -184,6 +184,7 @@ runs:
       shell: bash
       run: |
         echo "DATETIME=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
+        echo "SCP_UPLOAD_DIR=scp_upload_$GITHUB_SHA" >> $GITHUB_ENV
         if ${{ inputs.linkchecker_include_fragments }}; then
           echo "LINKCHECKER_FRAGMENTS=--include-fragments" >> $GITHUB_ENV
         else
@@ -205,12 +206,6 @@ runs:
           echo "LINKCHECKER_EXCLUDE=" >> $GITHUB_ENV
         fi
 
-    # - name: "Vars: debug"
-    #   shell: bash
-    #   run: |
-    #     echo "Inputs: ${{ toJson(inputs) }}"
-    #     echo "Environment: ${{ toJson(env) }}"
-
     # ----------------------------------------------------------------------------------------------
     # ARTIFACT DOWNLOAD
     # ----------------------------------------------------------------------------------------------
@@ -220,25 +215,6 @@ runs:
       with:
         name: ${{ inputs.artifact_name }}
         path: ./${{ env.SOURCE_DIR }}
-
-    # ----------------------------------------------------------------------------------------------
-    # LINK CHECKER
-    # ----------------------------------------------------------------------------------------------
-    - name: Run Link Checker
-      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' ) }}
-      uses: lycheeverse/lychee-action@v2
-      with:
-        args: >-
-          -r ${{ inputs.linkchecker_retry_times }}
-          -u "${{ inputs.linkchecker_user_agent }}"
-          ${{ env.LINKCHECKER_FRAGMENTS }}
-          ${{ env.LINKCHECKER_OFFLINE }}
-          ${{ env.LINKCHECKER_EXCLUDE }}
-          ${{ env.LINKCHECKER_VERBOSE }}
-          --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
-          --root-dir ${{ github.workspace }}/${{ inputs.artifact_name }}
-          ${{ inputs.artifact_name }}
-        fail: ${{ inputs.linkchecker_fail_on_errors }}
 
     # ----------------------------------------------------------------------------------------------
     # CASE: CONTENT FOR CLOSED OR MERGED PR
@@ -254,9 +230,9 @@ runs:
     # ----------------------------------------------------------------------------------------------
     # UPLOAD WEBSITE TO SERVER
     # ----------------------------------------------------------------------------------------------
-    - name: Move top-level files to a subdirectory
+    - name: Copy website files to a local subdirectory to preserve the file depth
       shell: bash
-      run: mkdir -p SCP_UPLOAD_DIR && mv ${{ env.SOURCE_DIR }}/* SCP_UPLOAD_DIR/
+      run: cp -r ${{ env.SOURCE_DIR }} ${{ env.SCP_UPLOAD_DIR }}
 
     - name: Upload Website to Server
       uses: appleboy/scp-action@v1.0.0
@@ -268,7 +244,7 @@ runs:
         timeout: ${{ inputs.ssh_timeout }}
         command_timeout: ${{ inputs.ssh_command_timeout }}
         target: ${{ env.TARGET_DIR }}
-        source: "SCP_UPLOAD_DIR/*"
+        source: "${{ env.SCP_UPLOAD_DIR }}/*"
         rm: ${{ inputs.ssh_rm }}
         strip_components: ${{ inputs.ssh_strip_components }}
 
@@ -302,3 +278,22 @@ runs:
           Pull Request Live Preview
           :---:
           | <p><br />:x: Preview has been removed.<br /><br /></p>
+
+    # ----------------------------------------------------------------------------------------------
+    # LINK CHECKER
+    # ----------------------------------------------------------------------------------------------
+    - name: Run Link Checker
+      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' ) }}
+      uses: lycheeverse/lychee-action@v2
+      with:
+        args: >-
+          -r ${{ inputs.linkchecker_retry_times }}
+          -u "${{ inputs.linkchecker_user_agent }}"
+          ${{ env.LINKCHECKER_FRAGMENTS }}
+          ${{ env.LINKCHECKER_OFFLINE }}
+          ${{ env.LINKCHECKER_EXCLUDE }}
+          ${{ env.LINKCHECKER_VERBOSE }}
+          --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
+          --root-dir ${{ github.workspace }}/${{ inputs.artifact_name }}
+          ${{ inputs.artifact_name }}
+        fail: ${{ inputs.linkchecker_fail_on_errors }}
