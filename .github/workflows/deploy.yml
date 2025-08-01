@@ -146,11 +146,19 @@ jobs:
     needs: vars
     if: inputs.linkchecker_enabled == true && (needs.vars.outputs.pr_closed_merged == '' || needs.vars.outputs.pr_closed_merged == 'false')
     steps:
-      - name: Download artifact
+      - name: Download artifact for production link check to .
         uses: actions/download-artifact@v4
+        if: inputs.condition_production
         with:
           name: ${{ inputs.artifact_name }}
           path: .
+
+      - name: Download artifact for preview link check to subdirectory
+        uses: actions/download-artifact@v4
+        if: github.event.pull_request
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ./${{ inputs.dir_preview_subdir }}
 
       - name: Link Checker
         uses: lycheeverse/lychee-action@v2
@@ -160,7 +168,9 @@ jobs:
             -u "${{ inputs.linkchecker_user_agent }}"
             ${{ needs.vars.outputs.linkchecker_fragments }}
             ${{ needs.vars.outputs.linkchecker_exclude }}
-            --max-concurrency ${{ inputs.linkchecker_max_concurrency }} .
+            --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
+            --root-dir ${{ github.workspace }}
+            .
           fail: ${{ inputs.linkchecker_fail_on_errors }}
 
   # Deployment jobs
