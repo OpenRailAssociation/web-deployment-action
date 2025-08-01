@@ -31,8 +31,10 @@ jobs:
           echo "<html><body>
           <p>Hello world: <a href="https://openrailassociation.org">LINK 1</a></p>
           <p>Don't linkcheck me: <a href="https://example.com">LINK 2</a></p>
+          <p>Relative link: <a href="foobar.html">LINK 3</a></p>
           <p>${{ github.ref }}.${{ github.event.pull_request.head.sha }}</p>
           </body></html>" > dist/index.html
+          echo "baz" > dist/foobar.html
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
