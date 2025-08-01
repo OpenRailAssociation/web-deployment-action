@@ -155,10 +155,10 @@ runs:
       run: |
         if ${{ env.IS_PRODUCTION }}; then
           echo "SOURCE_DIR=${{ inputs.artifact_name }}" >> $GITHUB_ENV
-          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_production }}/" >> $GITHUB_ENV
+          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_production }}" >> $GITHUB_ENV
         else
           echo "SOURCE_DIR=${{ inputs.artifact_name }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
-          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}/" >> $GITHUB_ENV
+          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
         fi
 
     - name: "Vars: Helper and linkcheck Variables"
@@ -231,6 +231,7 @@ runs:
     # ----------------------------------------------------------------------------------------------
     - name: Upload Website to Server
       uses: appleboy/scp-action@v1.0.0
+      working-directory: ${{ env.SOURCE_DIR }}
       with:
         host: ${{ inputs.ssh_host }}
         username: ${{ inputs.ssh_user }}
@@ -239,7 +240,7 @@ runs:
         timeout: ${{ inputs.ssh_timeout }}
         command_timeout: ${{ inputs.ssh_command_timeout }}
         target: ${{ env.TARGET_DIR }}
-        source: "./${{ env.SOURCE_DIR }}/*"
+        source: "./*"
         rm: ${{ inputs.ssh_rm }}
         strip_components: ${{ inputs.ssh_strip_components }}
 
