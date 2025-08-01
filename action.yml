@@ -181,10 +181,6 @@ runs:
           echo "LINKCHECKER_EXCLUDE=''" >> $GITHUB_ENV
         fi
 
-    - name: debug sh
-      shell: bash
-      run: echo "$(cat /home/runner/work/_temp/*.sh)"
-
     # - name: "Vars: debug"
     #   shell: bash
     #   run: |
@@ -196,7 +192,7 @@ runs:
     # ----------------------------------------------------------------------------------------------
     - name: Download Artifact
       uses: actions/download-artifact@v4
-      if: env.IS_PRODUCTION || env.IS_PREVIEW
+      if: env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true'
       with:
         name: ${{ inputs.artifact_name }}
         path: ./${{ env.SOURCE_DIR }}
@@ -205,7 +201,7 @@ runs:
     # LINK CHECKER
     # ----------------------------------------------------------------------------------------------
     - name: Run Link Checker
-      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION || env.IS_PREVIEW) }}
+      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' ) }}
       uses: lycheeverse/lychee-action@v2
       with:
         args: >-
@@ -223,10 +219,11 @@ runs:
     # CASE: CONTENT FOR CLOSED OR MERGED PR
     # ----------------------------------------------------------------------------------------------
     - name: Prepare placeholder index.html
-      if: env.IS_PR_CLOSED_OR_MERGED
+      if: env.IS_PR_CLOSED_OR_MERGED == 'true'
       shell: bash
       run: |
         rm -rfv ${{ env.SOURCE_DIR }}
+        mkdir -p ${{ env.SOURCE_DIR }}
         echo "This PR has been closed or merged. The preview has been removed." > ${{ env.SOURCE_DIR }}/index.html
 
     # ----------------------------------------------------------------------------------------------
