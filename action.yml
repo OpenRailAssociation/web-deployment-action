@@ -153,7 +153,7 @@ runs:
     - name: "Vars: Source and Target Directory"
       shell: bash
       run: |
-        if [ ${{ env.IS_PRODUCTION }} ]; then
+        if ${{ env.IS_PRODUCTION }}; then
           echo "source_dir=${{ inputs.artifact_name }}" >> $GITHUB_ENV
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_production }}/" >> $GITHUB_ENV
         else
@@ -174,8 +174,8 @@ runs:
     - name: "Vars: debug"
       shell: bash
       run: |
-        echo "Inputs: ${{ toJson(inputs) }}" >> $GITHUB_ENV
-        echo "Environment: ${{ toJson(env) }}" >> $GITHUB_ENV
+        echo "Inputs: ${{ toJson(inputs) }}"
+        echo "Environment: ${{ toJson(env) }}"
 
     # ----------------------------------------------------------------------------------------------
     # ARTIFACT DOWNLOAD
