@@ -185,18 +185,18 @@ runs:
       shell: bash
       run: echo "$(cat /home/runner/work/_temp/*.sh)"
 
-    - name: "Vars: debug"
-      shell: bash
-      run: |
-        echo "Inputs: ${{ toJson(inputs) }}"
-        echo "Environment: ${{ toJson(env) }}"
+    # - name: "Vars: debug"
+    #   shell: bash
+    #   run: |
+    #     echo "Inputs: ${{ toJson(inputs) }}"
+    #     echo "Environment: ${{ toJson(env) }}"
 
     # ----------------------------------------------------------------------------------------------
     # ARTIFACT DOWNLOAD
     # ----------------------------------------------------------------------------------------------
     - name: Download Artifact
       uses: actions/download-artifact@v4
-      if: inputs.condition_production
+      if: env.IS_PRODUCTION || env.IS_PREVIEW
       with:
         name: ${{ inputs.artifact_name }}
         path: ./${{ env.SOURCE_DIR }}
@@ -205,7 +205,7 @@ runs:
     # LINK CHECKER
     # ----------------------------------------------------------------------------------------------
     - name: Run Link Checker
-      if: ${{ inputs.linkchecker_enabled == 'true' && env.IS_PR_CLOSED_OR_MERGED != 'true' }}
+      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION || env.IS_PREVIEW) }}
       uses: lycheeverse/lychee-action@v2
       with:
         args: >-
@@ -223,7 +223,7 @@ runs:
     # CASE: CONTENT FOR CLOSED OR MERGED PR
     # ----------------------------------------------------------------------------------------------
     - name: Prepare placeholder index.html
-      if: ${{ github.event.pull_request && env.IS_PR_CLOSED_OR_MERGED != 'false' }}
+      if: env.IS_PR_CLOSED_OR_MERGED
       shell: bash
       run: |
         rm -rfv ${{ env.SOURCE_DIR }}
