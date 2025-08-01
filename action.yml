@@ -166,19 +166,19 @@ runs:
       run: |
         echo "DATETIME=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
         if ${{ inputs.linkchecker_include_fragments }}; then
-          echo "LINKCHECKER_FRAGMENTS='--include-fragments'" >> $GITHUB_ENV
+          echo "LINKCHECKER_FRAGMENTS=--include-fragments" >> $GITHUB_ENV
         else
-          echo "LINKCHECKER_FRAGMENTS=''" >> $GITHUB_ENV
+          echo "LINKCHECKER_FRAGMENTS=" >> $GITHUB_ENV
         fi
         if ${{ inputs.linkchecker_verbose }}; then
-          echo "LINKCHECKER_VERBOSE='--verbose'" >> $GITHUB_ENV
+          echo "LINKCHECKER_VERBOSE=--verbose" >> $GITHUB_ENV
         else
-          echo "LINKCHECKER_VERBOSE=''" >> $GITHUB_ENV
+          echo "LINKCHECKER_VERBOSE=" >> $GITHUB_ENV
         fi
         if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
           echo "LINKCHECKER_EXCLUDE=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         else
-          echo "LINKCHECKER_EXCLUDE=''" >> $GITHUB_ENV
+          echo "LINKCHECKER_EXCLUDE=" >> $GITHUB_ENV
         fi
 
     # - name: "Vars: debug"
@@ -229,9 +229,12 @@ runs:
     # ----------------------------------------------------------------------------------------------
     # UPLOAD WEBSITE TO SERVER
     # ----------------------------------------------------------------------------------------------
+    - name: Change path to source directory
+      shell: bash
+      run: cd ${{ env.SOURCE_DIR }}
+
     - name: Upload Website to Server
       uses: appleboy/scp-action@v1.0.0
-      working-directory: ${{ env.SOURCE_DIR }}
       with:
         host: ${{ inputs.ssh_host }}
         username: ${{ inputs.ssh_user }}
