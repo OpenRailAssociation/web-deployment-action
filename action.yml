@@ -50,6 +50,10 @@ inputs:
     description: "SSH username"
     required: true
 
+  ssh_key:
+    description: "SSH private key for authenticating with the deployment server"
+    required: true
+
   ssh_port:
     description: "SSH port"
     required: false
@@ -125,18 +129,113 @@ inputs:
     required: false
     default: "true"
 
-secrets:
-  ssh_key:
-    description: "SSH private key for authenticating with the deployment server"
-    required: true
-
 outputs:
-  production_url:
-    description: "The URL of the deployed production website"
-
-  preview_url:
-    description: "The URL of the deployed preview website"
+  url:
+    description: "The URL of the deployed production or preview website"
 
 runs:
-  using: workflow
-  main: .github/workflows/deploy.yml
+  using: "composite"
+  steps:
+    - name: Setup vars
+      id: vars
+      shell: bash
+      run: |
+        echo "pr_closed_merged=${{ github.event.pull_request.closed_at || github.event.pull_request.merged }}" >> $GITHUB_ENV
+        echo "datetime=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
+        echo "linkchecker_fragments=$( [ \"${{ inputs.linkchecker_include_fragments }}\" == 'true' ] && echo '--include-fragments' || echo '')" >> $GITHUB_ENV
+        echo "linkchecker_verbose=$( [ \"${{ inputs.linkchecker_verbose }}\" == 'true' ] && echo '--verbose' || echo '')" >> $GITHUB_ENV
+        if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
+          echo "linkchecker_exclude=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
+        fi
+        if [ ${{ inputs.condition_production == 'true' && env.pr_closed_merged != 'true' }} ]; then
+          echo "source_dir=" >> $GITHUB_ENV
+          echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_production }}/" >> $GITHUB_ENV
+        else
+          echo "source_dir=${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+          echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}/" >> $GITHUB_ENV
+        fi
+
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+      if: inputs.condition_production
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: ./${{ env.source_dir }}
+
+    - name: Run Link Checker
+      if: ${{ inputs.linkchecker_enabled == 'true' && env.pr_closed_merged != 'true' }}
+      uses: lycheeverse/lychee-action@v2
+      with:
+        args: >-
+          -r ${{ inputs.linkchecker_retry_times }}
+          -u "${{ inputs.linkchecker_user_agent }}"
+          ${{ env.linkchecker_fragments }}
+          ${{ env.linkchecker_exclude }}
+          ${{ env.linkchecker_verbose }}
+          --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
+          --root-dir ${{ github.workspace }}
+          .
+        fail: ${{ inputs.linkchecker_fail_on_errors }}
+
+    # ----------------------------------------------------------------------------------------------
+    # CASE 2: CONTENT FOR CLOSE OR MERGE
+    # ----------------------------------------------------------------------------------------------
+    - name: Prepare placeholder index.html
+      if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' }}
+      shell: bash
+      run: |
+        echo "This PR has been closed or merged. The preview has been removed." > index.html
+
+    # ----------------------------------------------------------------------------------------------
+    # UPLOAD WEBSITE TO SERVER
+    # ----------------------------------------------------------------------------------------------
+    - name: Upload Empty Folder to Remove Preview
+      if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' }}
+      uses: appleboy/scp-action@v1.0.0
+      with:
+        host: ${{ inputs.ssh_host }}
+        username: ${{ inputs.ssh_user }}
+        key: ${{ env.ssh_key }}
+        port: ${{ inputs.ssh_port }}
+        timeout: ${{ inputs.ssh_timeout }}
+        command_timeout: ${{ inputs.ssh_command_timeout }}
+        target: ${{ env.target_dir }}
+        source: "./${{ env.source_dir }}/*"
+        rm: ${{ inputs.ssh_rm }}
+        strip_components: ${{ inputs.ssh_strip_components }}
+
+    # ----------------------------------------------------------------------------------------------
+    # REPORTING AND COMMENTS
+    # ----------------------------------------------------------------------------------------------
+    # - name: Add Production Summary
+    #   if: ${{ inputs.condition_production == 'true' && inputs.step_summary_enabled == 'true' && env.pr_closed_merged != 'true' }}
+    #   run: echo "# Website Deployment Summary\nDeployed website to production ${{ inputs.domain_production }}" >> $GITHUB_STEP_SUMMARY
+
+    # - name: Sticky Preview Comment
+    #   if: ${{ github.event.pull_request && env.pr_closed_merged == 'false' && inputs.sticky_comment_enabled == 'true' }}
+    #   uses: marocchino/sticky-pull-request-comment@v2.9.4
+    #   with:
+    #     header: pr-preview
+    #     message: |
+    #       Pull Request Live Preview
+    #       :---:
+    #       | <p><br />:rocket: View preview at <br />${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}/<br /><br /></p>
+    #       | <p>Last updated: ${{ env.datetime }}</p>
+
+    # - name: Add Preview Summary
+    #   if: ${{ github.event.pull_request && env.pr_closed_merged == 'false' && inputs.step_summary_enabled == 'true' }}
+    #   run: echo "# Website Deployment Summary\nDeployed preview website to ${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_STEP_SUMMARY
+
+    # - name: Sticky Comment - Preview Removed
+    #   if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' && inputs.sticky_comment_enabled == 'true' }}
+    #   uses: marocchino/sticky-pull-request-comment@v2.9.4
+    #   with:
+    #     header: pr-preview
+    #     message: |
+    #       Pull Request Live Preview
+    #       :---:
+    #       | <p><br />:x: Preview has been removed.<br /><br /></p>
+
+    # - name: Add Removal Summary
+    #   if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' && inputs.step_summary_enabled == 'true' }}
+    #   run: echo "# Website Deployment Summary\nRemoved preview website at ${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_STEP_SUMMARY

@@ -45,18 +45,22 @@ jobs:
   deploy:
     name: Web Deployment
     needs: build
-    uses: ./.github/workflows/deploy.yml
-    with:
-      artifact_name: website
-      domain_production: https://web-deployment-action.openrailassociation.org
-      domain_preview: https://web-preview.openrailassociation.org
-      ssh_host: uberspace1.openrailassociation.org
-      ssh_user: openrail
-      dir_base: "/var/www/virtual/openrail"
-      dir_production: "web-deployment-action.openrailassociation.org"
-      dir_preview_base: "web-preview.openrailassociation.org"
-      dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
-      linkchecker_exclude: "example.com,example.org"
-      condition_production: ${{ github.ref == 'refs/heads/main' }}
-    secrets:
-      ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Call action locally
+        uses: ./
+        with:
+          artifact_name: website
+          domain_production: https://web-deployment-action.openrailassociation.org
+          domain_preview: https://web-preview.openrailassociation.org
+          ssh_host: uberspace1.openrailassociation.org
+          ssh_user: openrail
+          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          dir_base: "/var/www/virtual/openrail"
+          dir_production: "web-deployment-action.openrailassociation.org"
+          dir_preview_base: "web-preview.openrailassociation.org"
+          dir_preview_subdir: "webdeploy-pr-${{ github.event.number }}"
+          linkchecker_exclude: "example.com,example.org"
+          condition_production: ${{ github.ref == 'refs/heads/main' }}
