@@ -147,7 +147,12 @@ runs:
     - name: "Vars: PR Closed/Merged"
       shell: bash
       run: |
-        echo "IS_PR_CLOSED_OR_MERGED=${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}" >> $GITHUB_ENV
+        PR_CLOSED_OR_MERGED="${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}"
+        if [ -n "$PR_CLOSED_OR_MERGED" ] && [ "$PR_CLOSED_OR_MERGED" != "false" ]; then
+          echo "IS_PR_CLOSED_OR_MERGED=true" >> $GITHUB_ENV
+        else
+          echo "IS_PR_CLOSED_OR_MERGED=false" >> $GITHUB_ENV
+        fi
 
     - name: "Vars: Prod or Preview"
       shell: bash
