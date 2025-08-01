@@ -48,11 +48,13 @@ jobs:
       - name: Build Website
         run: |
           mkdir -p dist && echo "<html>Hello</html>" > dist/index.html
-      # Artifact has to be uploaded, using `artifact_name` as name
+      # Artifact has to be uploaded. `name` has to be the action's input `artifact_name`
       - uses: actions/upload-artifact@v4
         with:
           name: website
           path: dist
+          include-hidden-files: true
+          retention-days: 1
 
   deploy:
     needs: build
@@ -100,6 +102,7 @@ jobs:
 | `linkchecker_enabled` | <p>Enable link checker (true/false)</p> | `false` | `true` |
 | `linkchecker_exclude` | <p>Comma-separated list of domains to exclude from link checker</p> | `false` | `""` |
 | `linkchecker_include_fragments` | <p>Include anchor fragments in link checking</p> | `false` | `true` |
+| `linkchecker_offline` | <p>Only check local/relative links, do not fetch remote links (true/false)</p> | `false` | `false` |
 | `linkchecker_max_concurrency` | <p>Max concurrent requests for link checker</p> | `false` | `1` |
 | `linkchecker_user_agent` | <p>User-Agent for link checking</p> | `false` | `Mozilla/5.0 (Windows NT 10.0; Win64; x64)...` |
 | `linkchecker_retry_times` | <p>Retry delay in seconds for link checking</p> | `false` | `5` |

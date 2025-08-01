@@ -94,6 +94,11 @@ inputs:
     required: false
     default: "true"
 
+  linkchecker_offline:
+    description: "Only check local/relative links, do not fetch remote links (true/false)"
+    required: false
+    default: "false"
+
   linkchecker_max_concurrency:
     description: "Max concurrent requests for link checker"
     required: false
@@ -142,7 +147,12 @@ runs:
     - name: "Vars: PR Closed/Merged"
       shell: bash
       run: |
-        echo "IS_PR_CLOSED_OR_MERGED=${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}" >> $GITHUB_ENV
+        PR_CLOSED_OR_MERGED="${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}"
+        if [ -n "$PR_CLOSED_OR_MERGED" ] && [ "$PR_CLOSED_OR_MERGED" != "false" ]; then
+          echo "IS_PR_CLOSED_OR_MERGED=true" >> $GITHUB_ENV
+        else
+          echo "IS_PR_CLOSED_OR_MERGED=false" >> $GITHUB_ENV
+        fi
 
     - name: "Vars: Prod or Preview"
       shell: bash
@@ -178,6 +188,11 @@ runs:
           echo "LINKCHECKER_FRAGMENTS=--include-fragments" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_FRAGMENTS=" >> $GITHUB_ENV
+        fi
+        if ${{ inputs.linkchecker_offline }}; then
+          echo "LINKCHECKER_OFFLINE=--offline" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_OFFLINE=" >> $GITHUB_ENV
         fi
         if ${{ inputs.linkchecker_verbose }}; then
           echo "LINKCHECKER_VERBOSE=--verbose" >> $GITHUB_ENV
@@ -217,6 +232,7 @@ runs:
           -r ${{ inputs.linkchecker_retry_times }}
           -u "${{ inputs.linkchecker_user_agent }}"
           ${{ env.LINKCHECKER_FRAGMENTS }}
+          ${{ env.LINKCHECKER_OFFLINE }}
           ${{ env.LINKCHECKER_EXCLUDE }}
           ${{ env.LINKCHECKER_VERBOSE }}
           --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
@@ -247,7 +263,7 @@ runs:
       with:
         host: ${{ inputs.ssh_host }}
         username: ${{ inputs.ssh_user }}
-        key: ${{ env.ssh_key }}
+        key: ${{ inputs.ssh_key }}
         port: ${{ inputs.ssh_port }}
         timeout: ${{ inputs.ssh_timeout }}
         command_timeout: ${{ inputs.ssh_command_timeout }}
