@@ -53,6 +53,8 @@ jobs:
         with:
           name: website
           path: dist
+          include-hidden-files: true
+          retention-days: 1
 
   deploy:
     needs: build
