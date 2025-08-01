@@ -151,14 +151,15 @@ runs:
           echo "linkchecker_exclude=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         fi
         if [ ${{ env.is_production }} ]; then
-          echo "source_dir=" >> $GITHUB_ENV
+          echo "source_dir=${{ inputs.artifact_name }}" >> $GITHUB_ENV
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_production }}/" >> $GITHUB_ENV
         else
-          echo "source_dir=${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+          echo "source_dir=${{ inputs.artifact_name }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}/" >> $GITHUB_ENV
         fi
 
     - name: Test env setting
+      shell: bash
       run: |
         echo "TEST=${{ env.TEST }}"
         echo "is_production=${{ env.is_production }}"
@@ -167,6 +168,7 @@ runs:
         echo "linkchecker_fragments=${{ env.linkchecker_fragments }}"
         echo "linkchecker_verbose=${{ env.linkchecker_verbose }}"
         echo "linkchecker_exclude=${{ env.linkchecker_exclude }}"
+        echo "linkchecker_fail_on_errors=${{ inputs.linkchecker_fail_on_errors }}"
 
     - name: Download Artifact
       uses: actions/download-artifact@v4
@@ -186,8 +188,8 @@ runs:
           ${{ env.linkchecker_exclude }}
           ${{ env.linkchecker_verbose }}
           --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
-          --root-dir ${{ github.workspace }}
-          .
+          --root-dir ${{ github.workspace }}/${{ inputs.artifact_name }}
+          ${{ inputs.artifact_name }}
         fail: ${{ inputs.linkchecker_fail_on_errors }}
 
     # ----------------------------------------------------------------------------------------------
