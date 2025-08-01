@@ -136,21 +136,24 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup vars
-      id: vars
+    # ----------------------------------------------------------------------------------------------
+    # VARIABLES AND ENVIRONMENT SETUP
+    # ----------------------------------------------------------------------------------------------
+    - name: "Vars: PR Closed/Merged"
       shell: bash
       run: |
-        echo "pr_closed_merged=${{ github.event.pull_request.closed_at || github.event.pull_request.merged }}" >> $GITHUB_ENV
-        echo "is_production=${{ inputs.condition_production == 'true' && env.pr_closed_merged != 'true' }}" >> $GITHUB_ENV
-        echo "TEST=foo" >> $GITHUB_ENV
-        echo "${{ env.TEST }}"
-        echo "datetime=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
-        echo "linkchecker_fragments=$( [ \"${{ inputs.linkchecker_include_fragments }}\" == 'true' ] && echo '--include-fragments' || echo '')" >> $GITHUB_ENV
-        echo "linkchecker_verbose=$( [ \"${{ inputs.linkchecker_verbose }}\" == 'true' ] && echo '--verbose' || echo '')" >> $GITHUB_ENV
-        if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
-          echo "linkchecker_exclude=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
-        fi
-        if [ ${{ env.is_production }} ]; then
+        echo "IS_PR_CLOSED_OR_MERGED=${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}" >> $GITHUB_ENV
+
+    - name: "Vars: Prod or Preview"
+      shell: bash
+      run: |
+        echo "IS_PRODUCTION=${{ inputs.condition_production == 'true' && env.IS_PR_CLOSED_OR_MERGED != 'true' }}" >> $GITHUB_ENV
+        echo "IS_PREVIEW=${{ github.event.pull_request && env.IS_PR_CLOSED_OR_MERGED != 'true' }}" >> $GITHUB_ENV
+
+    - name: "Vars: Source and Target Directory"
+      shell: bash
+      run: |
+        if [ ${{ env.IS_PRODUCTION }} ]; then
           echo "source_dir=${{ inputs.artifact_name }}" >> $GITHUB_ENV
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_production }}/" >> $GITHUB_ENV
         else
@@ -158,18 +161,25 @@ runs:
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}/" >> $GITHUB_ENV
         fi
 
-    - name: Test env setting
+    - name: "Vars: Helper and linkcheck Variables"
       shell: bash
       run: |
-        echo "TEST=${{ env.TEST }}"
-        echo "is_production=${{ env.is_production }}"
-        echo "pr_closed_merged=${{ env.pr_closed_merged }}"
-        echo "datetime=${{ env.datetime }}"
-        echo "linkchecker_fragments=${{ env.linkchecker_fragments }}"
-        echo "linkchecker_verbose=${{ env.linkchecker_verbose }}"
-        echo "linkchecker_exclude=${{ env.linkchecker_exclude }}"
-        echo "linkchecker_fail_on_errors=${{ inputs.linkchecker_fail_on_errors }}"
+        echo "datetime=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
+        echo "linkchecker_fragments=$( [ \"${{ inputs.linkchecker_include_fragments }}\" == 'true' ] && echo '--include-fragments' || echo '')" >> $GITHUB_ENV
+        echo "linkchecker_verbose=$( [ \"${{ inputs.linkchecker_verbose }}\" == 'true' ] && echo '--verbose' || echo '')" >> $GITHUB_ENV
+        if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
+          echo "linkchecker_exclude=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
+        fi
 
+    - name: "Vars: debug"
+      shell: bash
+      run: |
+        echo "Inputs: ${{ toJson(inputs) }}" >> $GITHUB_ENV
+        echo "Environment: ${{ toJson(env) }}" >> $GITHUB_ENV
+
+    # ----------------------------------------------------------------------------------------------
+    # ARTIFACT DOWNLOAD
+    # ----------------------------------------------------------------------------------------------
     - name: Download Artifact
       uses: actions/download-artifact@v4
       if: inputs.condition_production
@@ -177,8 +187,11 @@ runs:
         name: ${{ inputs.artifact_name }}
         path: ./${{ env.source_dir }}
 
+    # ----------------------------------------------------------------------------------------------
+    # LINK CHECKER
+    # ----------------------------------------------------------------------------------------------
     - name: Run Link Checker
-      if: ${{ inputs.linkchecker_enabled == 'true' && env.pr_closed_merged != 'true' }}
+      if: ${{ inputs.linkchecker_enabled == 'true' && env.IS_PR_CLOSED_OR_MERGED != 'true' }}
       uses: lycheeverse/lychee-action@v2
       with:
         args: >-
@@ -193,19 +206,19 @@ runs:
         fail: ${{ inputs.linkchecker_fail_on_errors }}
 
     # ----------------------------------------------------------------------------------------------
-    # CASE 2: CONTENT FOR CLOSE OR MERGE
+    # CASE: CONTENT FOR CLOSED OR MERGED PR
     # ----------------------------------------------------------------------------------------------
     - name: Prepare placeholder index.html
-      if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' }}
+      if: ${{ github.event.pull_request && env.IS_PR_CLOSED_OR_MERGED != 'false' }}
       shell: bash
       run: |
-        echo "This PR has been closed or merged. The preview has been removed." > index.html
+        rm -rfv ${{ env.source_dir }}
+        echo "This PR has been closed or merged. The preview has been removed." > ${{ env.source_dir }}/index.html
 
     # ----------------------------------------------------------------------------------------------
     # UPLOAD WEBSITE TO SERVER
     # ----------------------------------------------------------------------------------------------
-    - name: Upload Empty Folder to Remove Preview
-      if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' }}
+    - name: Upload Website to Server
       uses: appleboy/scp-action@v1.0.0
       with:
         host: ${{ inputs.ssh_host }}
