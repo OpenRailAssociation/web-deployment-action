@@ -161,6 +161,15 @@ runs:
           echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
         fi
 
+    - name: "Vars: Set URLs"
+      shell: bash
+      run: |
+        if ${{ env.IS_PRODUCTION }}; then
+          echo "URL=${{ inputs.domain_production }}" >> $GITHUB_ENV
+        else
+          echo "URL=${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+        fi
+
     - name: "Vars: Helper and linkcheck Variables"
       shell: bash
       run: |
@@ -250,35 +259,30 @@ runs:
     # ----------------------------------------------------------------------------------------------
     # REPORTING AND COMMENTS
     # ----------------------------------------------------------------------------------------------
-    # - name: Add Production Summary
-    #   if: ${{ inputs.condition_production == 'true' && inputs.step_summary_enabled == 'true' && env.pr_closed_merged != 'true' }}
-    #   run: echo "# Website Deployment Summary\nDeployed website to production ${{ inputs.domain_production }}" >> $GITHUB_STEP_SUMMARY
+    - name: Write Step Summary
+      if: inputs.step_summary_enabled == 'true'
+      shell: bash
+      run: |
+          SUMMARY=$'# Website Deployment Summary\nDeployed production/preview website to ${{ env.URL }}'
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
-    # - name: Sticky Preview Comment
-    #   if: ${{ github.event.pull_request && env.pr_closed_merged == 'false' && inputs.sticky_comment_enabled == 'true' }}
-    #   uses: marocchino/sticky-pull-request-comment@v2.9.4
-    #   with:
-    #     header: pr-preview
-    #     message: |
-    #       Pull Request Live Preview
-    #       :---:
-    #       | <p><br />:rocket: View preview at <br />${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}/<br /><br /></p>
-    #       | <p>Last updated: ${{ env.DATETIME }}</p>
+    - name: "Sticky Comment: Add or Update"
+      if: inputs.sticky_comment_enabled == 'true' && env.IS_PREVIEW == 'true'
+      uses: marocchino/sticky-pull-request-comment@v2.9.4
+      with:
+        header: pr-preview
+        message: |
+          Pull Request Live Preview
+          :---:
+          | <p><br />:rocket: View preview at <br />${{ env.URL }}/<br /><br /></p>
+          | <p>Last updated: ${{ env.DATETIME }}</p>
 
-    # - name: Add Preview Summary
-    #   if: ${{ github.event.pull_request && env.pr_closed_merged == 'false' && inputs.step_summary_enabled == 'true' }}
-    #   run: echo "# Website Deployment Summary\nDeployed preview website to ${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_STEP_SUMMARY
-
-    # - name: Sticky Comment - Preview Removed
-    #   if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' && inputs.sticky_comment_enabled == 'true' }}
-    #   uses: marocchino/sticky-pull-request-comment@v2.9.4
-    #   with:
-    #     header: pr-preview
-    #     message: |
-    #       Pull Request Live Preview
-    #       :---:
-    #       | <p><br />:x: Preview has been removed.<br /><br /></p>
-
-    # - name: Add Removal Summary
-    #   if: ${{ github.event.pull_request && env.pr_closed_merged != 'false' && inputs.step_summary_enabled == 'true' }}
-    #   run: echo "# Website Deployment Summary\nRemoved preview website at ${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_STEP_SUMMARY
+    - name: "Sticky Comment: Remove"
+      if: inputs.sticky_comment_enabled == 'true' && env.IS_PR_CLOSED_OR_MERGED == 'true'
+      uses: marocchino/sticky-pull-request-comment@v2.9.4
+      with:
+        header: pr-preview
+        message: |
+          Pull Request Live Preview
+          :---:
+          | <p><br />:x: Preview has been removed.<br /><br /></p>
