@@ -14,12 +14,32 @@ inputs:
     description: "The name of the uploaded artifact to deploy."
     required: true
 
+  condition_production:
+    description: "Condition to deploy to production (e.g. `FIXME`)"
+    required: true
+
   domain_production:
     description: "Domain name for the production deployment, e.g. https://example.com"
-    required: false
+    required: true
 
   domain_preview:
     description: "Domain name for the preview deployment, e.g. https://preview.example.com"
+    required: true
+
+  dir_base:
+    description: "Remote base directory (e.g. /var/www/virtual)"
+    required: true
+
+  dir_production:
+    description: "Full path for production deployment"
+    required: true
+
+  dir_preview_base:
+    description: "Preview base domain (e.g. preview)"
+    required: true
+
+  dir_preview_subdir:
+    description: "Preview subdir (e.g. pr-123)"
     required: true
 
   ssh_host:
@@ -28,6 +48,10 @@ inputs:
 
   ssh_user:
     description: "SSH username"
+    required: true
+
+  ssh_key:
+    description: "SSH private key for authenticating with the deployment server"
     required: true
 
   ssh_port:
@@ -54,22 +78,6 @@ inputs:
     description: "How many path components to strip (for tar/scp unpacking)"
     required: false
     default: "1"
-
-  dir_base:
-    description: "Remote base directory (e.g. /var/www/virtual)"
-    required: true
-
-  dir_production:
-    description: "Full path for production deployment"
-    required: true
-
-  dir_preview_base:
-    description: "Preview base domain (e.g. preview)"
-    required: true
-
-  dir_preview_subdir:
-    description: "Preview subdir (e.g. pr-123)"
-    required: true
 
   linkchecker_enabled:
     description: "Enable link checker (true/false)"
@@ -106,6 +114,11 @@ inputs:
     required: false
     default: "false"
 
+  linkchecker_verbose:
+    description: "Turn on verbose linkchecker logging in action logs (true/false)"
+    required: false
+    default: "false"
+
   sticky_comment_enabled:
     description: "Whether to enable sticky comments for the pull request. Defaults to true."
     required: false
@@ -116,18 +129,160 @@ inputs:
     required: false
     default: "true"
 
-secrets:
-  ssh_key:
-    description: "SSH private key for authenticating with the deployment server"
-    required: true
-
 outputs:
-  production_url:
-    description: "The URL of the deployed production website"
-
-  preview_url:
-    description: "The URL of the deployed preview website"
+  url:
+    description: "The URL of the deployed production or preview website"
 
 runs:
-  using: "workflow"
-  main: ".github/workflows/deploy.yml"
+  using: "composite"
+  steps:
+    # ----------------------------------------------------------------------------------------------
+    # VARIABLES AND ENVIRONMENT SETUP
+    # ----------------------------------------------------------------------------------------------
+    - name: "Vars: PR Closed/Merged"
+      shell: bash
+      run: |
+        echo "IS_PR_CLOSED_OR_MERGED=${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}" >> $GITHUB_ENV
+
+    - name: "Vars: Prod or Preview"
+      shell: bash
+      run: |
+        echo "IS_PRODUCTION=${{ inputs.condition_production == 'true' && env.IS_PR_CLOSED_OR_MERGED != 'true' }}" >> $GITHUB_ENV
+        echo "IS_PREVIEW=${{ github.event.pull_request && env.IS_PR_CLOSED_OR_MERGED != 'true' }}" >> $GITHUB_ENV
+
+    - name: "Vars: Source and Target Directory"
+      shell: bash
+      run: |
+        if ${{ env.IS_PRODUCTION }}; then
+          echo "SOURCE_DIR=${{ inputs.artifact_name }}" >> $GITHUB_ENV
+          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_production }}" >> $GITHUB_ENV
+        else
+          echo "SOURCE_DIR=${{ inputs.artifact_name }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+        fi
+
+    - name: "Vars: Set URLs"
+      shell: bash
+      run: |
+        if ${{ env.IS_PRODUCTION }}; then
+          echo "URL=${{ inputs.domain_production }}" >> $GITHUB_ENV
+        else
+          echo "URL=${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+        fi
+
+    - name: "Vars: Helper and linkcheck Variables"
+      shell: bash
+      run: |
+        echo "DATETIME=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
+        if ${{ inputs.linkchecker_include_fragments }}; then
+          echo "LINKCHECKER_FRAGMENTS=--include-fragments" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_FRAGMENTS=" >> $GITHUB_ENV
+        fi
+        if ${{ inputs.linkchecker_verbose }}; then
+          echo "LINKCHECKER_VERBOSE=--verbose" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_VERBOSE=" >> $GITHUB_ENV
+        fi
+        if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
+          echo "LINKCHECKER_EXCLUDE=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_EXCLUDE=" >> $GITHUB_ENV
+        fi
+
+    # - name: "Vars: debug"
+    #   shell: bash
+    #   run: |
+    #     echo "Inputs: ${{ toJson(inputs) }}"
+    #     echo "Environment: ${{ toJson(env) }}"
+
+    # ----------------------------------------------------------------------------------------------
+    # ARTIFACT DOWNLOAD
+    # ----------------------------------------------------------------------------------------------
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+      if: env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true'
+      with:
+        name: ${{ inputs.artifact_name }}
+        path: ./${{ env.SOURCE_DIR }}
+
+    # ----------------------------------------------------------------------------------------------
+    # LINK CHECKER
+    # ----------------------------------------------------------------------------------------------
+    - name: Run Link Checker
+      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' ) }}
+      uses: lycheeverse/lychee-action@v2
+      with:
+        args: >-
+          -r ${{ inputs.linkchecker_retry_times }}
+          -u "${{ inputs.linkchecker_user_agent }}"
+          ${{ env.LINKCHECKER_FRAGMENTS }}
+          ${{ env.LINKCHECKER_EXCLUDE }}
+          ${{ env.LINKCHECKER_VERBOSE }}
+          --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
+          --root-dir ${{ github.workspace }}/${{ inputs.artifact_name }}
+          ${{ inputs.artifact_name }}
+        fail: ${{ inputs.linkchecker_fail_on_errors }}
+
+    # ----------------------------------------------------------------------------------------------
+    # CASE: CONTENT FOR CLOSED OR MERGED PR
+    # ----------------------------------------------------------------------------------------------
+    - name: Prepare placeholder index.html
+      if: env.IS_PR_CLOSED_OR_MERGED == 'true'
+      shell: bash
+      run: |
+        rm -rfv ${{ env.SOURCE_DIR }}
+        mkdir -p ${{ env.SOURCE_DIR }}
+        echo "This PR has been closed or merged. The preview has been removed." > ${{ env.SOURCE_DIR }}/index.html
+
+    # ----------------------------------------------------------------------------------------------
+    # UPLOAD WEBSITE TO SERVER
+    # ----------------------------------------------------------------------------------------------
+    - name: Move top-level files to a subdirectory
+      shell: bash
+      run: mkdir -p SCP_UPLOAD_DIR && mv ${{ env.SOURCE_DIR }}/* SCP_UPLOAD_DIR/
+
+    - name: Upload Website to Server
+      uses: appleboy/scp-action@v1.0.0
+      with:
+        host: ${{ inputs.ssh_host }}
+        username: ${{ inputs.ssh_user }}
+        key: ${{ env.ssh_key }}
+        port: ${{ inputs.ssh_port }}
+        timeout: ${{ inputs.ssh_timeout }}
+        command_timeout: ${{ inputs.ssh_command_timeout }}
+        target: ${{ env.TARGET_DIR }}
+        source: "SCP_UPLOAD_DIR/*"
+        rm: ${{ inputs.ssh_rm }}
+        strip_components: ${{ inputs.ssh_strip_components }}
+
+    # ----------------------------------------------------------------------------------------------
+    # REPORTING AND COMMENTS
+    # ----------------------------------------------------------------------------------------------
+    - name: Write Step Summary
+      if: inputs.step_summary_enabled == 'true'
+      shell: bash
+      run: |
+          SUMMARY=$'# Website Deployment Summary\nDeployed production/preview website to ${{ env.URL }}'
+          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+
+    - name: "Sticky Comment: Add or Update"
+      if: inputs.sticky_comment_enabled == 'true' && env.IS_PREVIEW == 'true'
+      uses: marocchino/sticky-pull-request-comment@v2.9.4
+      with:
+        header: pr-preview
+        message: |
+          Pull Request Live Preview
+          :---:
+          | <p><br />:rocket: View preview at <br />${{ env.URL }}/<br /><br /></p>
+          | <p>Last updated: ${{ env.DATETIME }}</p>
+
+    - name: "Sticky Comment: Remove"
+      if: inputs.sticky_comment_enabled == 'true' && env.IS_PR_CLOSED_OR_MERGED == 'true'
+      uses: marocchino/sticky-pull-request-comment@v2.9.4
+      with:
+        header: pr-preview
+        message: |
+          Pull Request Live Preview
+          :---:
+          | <p><br />:x: Preview has been removed.<br /><br /></p>
