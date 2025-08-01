@@ -141,13 +141,16 @@ runs:
       shell: bash
       run: |
         echo "pr_closed_merged=${{ github.event.pull_request.closed_at || github.event.pull_request.merged }}" >> $GITHUB_ENV
+        echo "is_production=${{ inputs.condition_production == 'true' && env.pr_closed_merged != 'true' }}" >> $GITHUB_ENV
+        echo "TEST=foo" >> $GITHUB_ENV
+        echo "${{ env.TEST }}"
         echo "datetime=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
         echo "linkchecker_fragments=$( [ \"${{ inputs.linkchecker_include_fragments }}\" == 'true' ] && echo '--include-fragments' || echo '')" >> $GITHUB_ENV
         echo "linkchecker_verbose=$( [ \"${{ inputs.linkchecker_verbose }}\" == 'true' ] && echo '--verbose' || echo '')" >> $GITHUB_ENV
         if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
           echo "linkchecker_exclude=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         fi
-        if [ ${{ inputs.condition_production == 'true' && env.pr_closed_merged != 'true' }} ]; then
+        if [ ${{ env.is_production }} ]; then
           echo "source_dir=" >> $GITHUB_ENV
           echo "target_dir=${{ inputs.dir_base }}/${{ inputs.dir_production }}/" >> $GITHUB_ENV
         else
