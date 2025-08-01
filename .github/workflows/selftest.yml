@@ -68,4 +68,6 @@ jobs:
           dir_preview_base: "web-preview.openrailassociation.org"
           dir_preview_subdir: ${{ env.dir_preview_subdir }}
           linkchecker_exclude: "example.com,example.org"
+          linkchecker_include_fragments: true
+          linkchecker_verbose: true
           condition_production: ${{ env.condition_production }}

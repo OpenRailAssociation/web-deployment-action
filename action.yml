@@ -229,9 +229,9 @@ runs:
     # ----------------------------------------------------------------------------------------------
     # UPLOAD WEBSITE TO SERVER
     # ----------------------------------------------------------------------------------------------
-    - name: Change path to source directory
+    - name: Move top-level files to a subdirectory
       shell: bash
-      run: cd ${{ env.SOURCE_DIR }}
+      run: mkdir -p SCP_UPLOAD_DIR && mv ${{ env.SOURCE_DIR }}/* SCP_UPLOAD_DIR/
 
     - name: Upload Website to Server
       uses: appleboy/scp-action@v1.0.0
@@ -243,7 +243,7 @@ runs:
         timeout: ${{ inputs.ssh_timeout }}
         command_timeout: ${{ inputs.ssh_command_timeout }}
         target: ${{ env.TARGET_DIR }}
-        source: "./*"
+        source: "SCP_UPLOAD_DIR/*"
         rm: ${{ inputs.ssh_rm }}
         strip_components: ${{ inputs.ssh_strip_components }}
 
