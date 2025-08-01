@@ -171,6 +171,10 @@ runs:
           echo "linkchecker_exclude=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         fi
 
+    - name: debug sh
+      shell: bash
+      run: echo $(cat /home/runner/work/_temp/*.sh)
+
     - name: "Vars: debug"
       shell: bash
       run: |
