@@ -134,6 +134,11 @@ inputs:
     required: false
     default: "true"
 
+  deployment_enabled:
+    description: "Whether to create GitHub deployments. Requires the deployments permission. Defaults to false."
+    required: false
+    default: "false"
+
 outputs:
   url:
     description: "The URL of the deployed production or preview website"
@@ -278,6 +283,16 @@ runs:
           Pull Request Live Preview
           :---:
           | <p><br />:x: Preview has been removed.<br /><br /></p>
+
+    - name: "Create GitHub deployment"
+      if: inputs.deployment_enabled == true && env.IS_PREVIEW == 'true'
+      uses: chrnorm/deployment-action@51e93982518dc06e500fe65559032a439663aaac # v2.0.7
+      with:
+        token: '${{ github.token }}'
+        environment: preview
+        environment-url: '${{ env.URL }}'
+        transient-environment: true
+        initial-status: 'success'
 
     # ----------------------------------------------------------------------------------------------
     # LINK CHECKER
