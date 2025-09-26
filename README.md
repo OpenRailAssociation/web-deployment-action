@@ -110,6 +110,7 @@ jobs:
 | `linkchecker_verbose` | <p>Turn on verbose linkchecker logging in action logs (true/false)</p> | `false` | `false` |
 | `sticky_comment_enabled` | <p>Whether to enable sticky comments for the pull request. Defaults to true.</p> | `false` | `true` |
 | `step_summary_enabled` | <p>Whether to enable step summaries in the GitHub Actions UI. Defaults to true.</p> | `false` | `true` |
+| `gh_deployment` | <p>Name of the optional GitHub deployment to create. Requires the deployments permission. Defaults to empty, in which case no deployment is created.</p> | `false` | `""` |
 <!-- action-docs-inputs source="action.yml" -->
 
 <!-- action-docs-outputs source="action.yml" -->

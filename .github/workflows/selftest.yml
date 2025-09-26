@@ -71,3 +71,4 @@ jobs:
           linkchecker_exclude: "example.com,example.org"
           linkchecker_include_fragments: true
           linkchecker_verbose: true
+          gh_deployment: "preview"
