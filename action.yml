@@ -286,7 +286,7 @@ runs:
 
     - name: "Create GitHub deployment"
       if: inputs.gh_deployment != '' && env.IS_PREVIEW == 'true'
-      uses: chrnorm/deployment-action@51e93982518dc06e500fe65559032a439663aaac # v2.0.7
+      uses: chrnorm/deployment-action@55729fcebec3d284f60f5bcabbd8376437d696b1 # v2.0.7
       with:
         token: "${{ github.token }}"
         environment: "${{ inputs.gh_deployment }}"
