@@ -39,9 +39,19 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+# Set environment variables to reduce duplicated variables
+env:
+  artifact_name: website
+
+# Define permissions
+permissions:
+  contents: read
+  pull-requests: write # for sticky_comment_enabled
+  deployments: write # for gh_deployment
+
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       # Insert here your website build process, below a boilerplate
@@ -51,26 +61,29 @@ jobs:
       # Artifact has to be uploaded. `name` has to be the action's input `artifact_name`
       - uses: actions/upload-artifact@v4
         with:
-          name: website
+          name: ${{ env.artifact_name }}
           path: dist
           include-hidden-files: true
           retention-days: 1
 
   deploy:
+    name: Deploy website
     needs: build
-    uses: OpenRailAssociation/web-deployment-action@v1
-    with:
-      artifact_name: website
-      condition_production: ${{ github.ref == 'refs/heads/main' }}
-      domain_production: example.com
-      domain_preview: preview.example.com
-      ssh_host: ssh.example.com
-      ssh_user: webmaster
-      ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
-      dir_base: /var/www/
-      dir_production: html
-      dir_preview_base: preview
-      dir_preview_subdir: pr-${{ github.event.number }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: OpenRailAssociation/web-deployment-action@v1
+        with:
+          artifact_name: ${{ env.artifact_name }}
+          condition_production: ${{ github.ref == 'refs/heads/main' }}
+          domain_production: example.com
+          domain_preview: preview.example.com
+          ssh_host: ssh.example.com
+          ssh_user: webmaster
+          ssh_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          dir_base: /var/www/
+          dir_production: html
+          dir_preview_base: preview
+          dir_preview_subdir: pr-${{ github.event.number }}
 ```
 
 ## Requirements
