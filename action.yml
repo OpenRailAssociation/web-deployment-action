@@ -215,7 +215,7 @@ runs:
     # ARTIFACT DOWNLOAD
     # ----------------------------------------------------------------------------------------------
     - name: Download Artifact
-      uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+      uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
       if: env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true'
       with:
         name: ${{ inputs.artifact_name }}
@@ -299,7 +299,7 @@ runs:
     # ----------------------------------------------------------------------------------------------
     - name: Run Link Checker
       if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' ) }}
-      uses: lycheeverse/lychee-action@885c65f3dc543b57c898c8099f4e08c8afd178a2 # v2
+      uses: lycheeverse/lychee-action@885c65f3dc543b57c898c8099f4e08c8afd178a2 # v2.6.1
       with:
         args: >-
           -r ${{ inputs.linkchecker_retry_times }}
