@@ -107,7 +107,7 @@ inputs:
   linkchecker_user_agent:
     description: "User-Agent for link checking"
     required: false
-    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
+    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
   linkchecker_retry_times:
     description: "Retry delay in seconds for link checking"
@@ -123,6 +123,11 @@ inputs:
     description: "Turn on verbose linkchecker logging in action logs (true/false)"
     required: false
     default: "false"
+
+  linkchecker_extra_args:
+    description: "Extra arguments to pass to the link checker (e.g. --some-flag value)"
+    required: false
+    default: ""
 
   sticky_comment_enabled:
     description: "Whether to enable sticky comments for the pull request. Defaults to true."
@@ -209,6 +214,11 @@ runs:
           echo "LINKCHECKER_EXCLUDE=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_EXCLUDE=" >> $GITHUB_ENV
+        fi
+        if [ -n "${{ inputs.linkchecker_extra_args }}" ]; then
+          echo "LINKCHECKER_EXTRA_ARGS=${{ inputs.linkchecker_extra_args }}" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_EXTRA_ARGS=" >> $GITHUB_ENV
         fi
 
     # ----------------------------------------------------------------------------------------------
@@ -308,6 +318,7 @@ runs:
           ${{ env.LINKCHECKER_OFFLINE }}
           ${{ env.LINKCHECKER_EXCLUDE }}
           ${{ env.LINKCHECKER_VERBOSE }}
+          ${{ env.LINKCHECKER_EXTRA_ARGS }}
           --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
           --root-dir ${{ github.workspace }}/${{ inputs.artifact_name }}
           ${{ inputs.artifact_name }}
