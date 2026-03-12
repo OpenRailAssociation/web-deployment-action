@@ -107,7 +107,7 @@ inputs:
   linkchecker_user_agent:
     description: "User-Agent for link checking"
     required: false
-    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
+    default: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Apple WebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 
   linkchecker_retry_times:
     description: "Retry delay in seconds for link checking"
