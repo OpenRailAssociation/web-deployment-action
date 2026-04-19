@@ -246,11 +246,13 @@ runs:
     # UPLOAD WEBSITE TO SERVER
     # ----------------------------------------------------------------------------------------------
     - name: Copy website files to a local subdirectory to preserve the file depth
+      if: env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true'
       shell: bash
       run: cp -r ${{ env.SOURCE_DIR }} ${{ env.SCP_UPLOAD_DIR }}
 
     - name: Upload Website to Server
       uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1.0.0
+      if: env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true'
       with:
         host: ${{ inputs.ssh_host }}
         username: ${{ inputs.ssh_user }}
