@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.2.1...v1.2.2) (2026-04-20)
+
+
+### 📦 CI Improvements
+
+* harden CI using zizmor, improve docu ([#48](https://github.com/OpenRailAssociation/web-deployment-action/issues/48)) ([9be439b](https://github.com/OpenRailAssociation/web-deployment-action/commit/9be439bd3ea77b3396d7bf9d1a85a505a22cdf68))
+
 ## [1.2.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.2.0...v1.2.1) (2026-04-20)
 
 
