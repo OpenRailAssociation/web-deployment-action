@@ -45,11 +45,10 @@ concurrency:
 env:
   artifact_name: website
 
-# Define permissions
+# Define permissions globally. The deploy job needs additional permissions depending on
+# configuration, which are defined in the respective job.
 permissions:
   contents: read
-  pull-requests: write # for sticky_comment_enabled
-  deployments: write # for gh_deployment
 
 jobs:
   build:
@@ -72,6 +71,10 @@ jobs:
     name: Deploy website
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # if sticky_comment_enabled, which defaults to true
+      # deployments: write # if gh_deployment
     steps:
       - uses: OpenRailAssociation/web-deployment-action@v1
         with:
