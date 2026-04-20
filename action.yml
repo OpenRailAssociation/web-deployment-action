@@ -15,7 +15,7 @@ inputs:
     required: true
 
   condition_production:
-    description: "Condition to deploy to production (e.g. `FIXME`)"
+    description: "Condition to deploy to production. E.g., compare `github.ref` to `'refs/heads/main'`. See `.github/workflows/selftest.yml` for an example."
     required: true
 
   domain_production:
@@ -156,9 +156,10 @@ runs:
     # ----------------------------------------------------------------------------------------------
     - name: "Vars: PR Closed/Merged"
       shell: bash
+      env:
+        PR_CLOSED_OR_MERGED: ${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}
       run: |
-        PR_CLOSED_OR_MERGED="${{ github.event.pull_request && (github.event.pull_request.closed_at || github.event.pull_request.merged) }}"
-        if [ -n "$PR_CLOSED_OR_MERGED" ] && [ "$PR_CLOSED_OR_MERGED" != "false" ]; then
+        if [ -n "${PR_CLOSED_OR_MERGED}" ] && [ "${PR_CLOSED_OR_MERGED}" != "false" ]; then
           echo "IS_PR_CLOSED_OR_MERGED=true" >> $GITHUB_ENV
         else
           echo "IS_PR_CLOSED_OR_MERGED=false" >> $GITHUB_ENV
@@ -172,51 +173,67 @@ runs:
 
     - name: "Vars: Source and Target Directory"
       shell: bash
-      run: |
-        if ${{ env.IS_PRODUCTION }}; then
-          echo "SOURCE_DIR=${{ inputs.artifact_name }}" >> $GITHUB_ENV
-          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_production }}" >> $GITHUB_ENV
+      env:
+        INPUT_ARTIFACT_NAME: ${{ inputs.artifact_name }}
+        INPUT_DIR_BASE: ${{ inputs.dir_base }}
+        INPUT_DIR_PRODUCTION: ${{ inputs.dir_production }}
+        INPUT_DIR_PREVIEW_BASE: ${{ inputs.dir_preview_base }}
+        INPUT_DIR_PREVIEW_SUBDIR: ${{ inputs.dir_preview_subdir }}
+      run: | # zizmor: ignore[github-env]
+        if ${IS_PRODUCTION}; then
+          echo "SOURCE_DIR=${INPUT_ARTIFACT_NAME}" >> $GITHUB_ENV
+          echo "TARGET_DIR=${INPUT_DIR_BASE}/${INPUT_DIR_PRODUCTION}" >> $GITHUB_ENV
         else
-          echo "SOURCE_DIR=${{ inputs.artifact_name }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
-          echo "TARGET_DIR=${{ inputs.dir_base }}/${{ inputs.dir_preview_base }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+          echo "SOURCE_DIR=${INPUT_ARTIFACT_NAME}/${INPUT_DIR_PREVIEW_SUBDIR}" >> $GITHUB_ENV
+          echo "TARGET_DIR=${INPUT_DIR_BASE}/${INPUT_DIR_PREVIEW_BASE}/${INPUT_DIR_PREVIEW_SUBDIR}" >> $GITHUB_ENV
         fi
 
     - name: "Vars: Set URLs"
       shell: bash
-      run: |
-        if ${{ env.IS_PRODUCTION }}; then
-          echo "URL=${{ inputs.domain_production }}" >> $GITHUB_ENV
+      env:
+        INPUT_DOMAIN_PRODUCTION: ${{ inputs.domain_production }}
+        INPUT_DOMAIN_PREVIEW: ${{ inputs.domain_preview }}
+        INPUT_DIR_PREVIEW_SUBDIR: ${{ inputs.dir_preview_subdir }}
+      run: | # zizmor: ignore[github-env]
+        if ${IS_PRODUCTION}; then
+          echo "URL=${INPUT_DOMAIN_PRODUCTION}" >> $GITHUB_ENV
         else
-          echo "URL=${{ inputs.domain_preview }}/${{ inputs.dir_preview_subdir }}" >> $GITHUB_ENV
+          echo "URL=${INPUT_DOMAIN_PREVIEW}/${INPUT_DIR_PREVIEW_SUBDIR}" >> $GITHUB_ENV
         fi
 
     - name: "Vars: Helper and linkcheck Variables"
       shell: bash
-      run: |
+      env:
+        INPUT_LINKCHECKER_INCLUDE_FRAGMENTS: ${{ inputs.linkchecker_include_fragments }}
+        INPUT_LINKCHECKER_OFFLINE: ${{ inputs.linkchecker_offline }}
+        INPUT_LINKCHECKER_VERBOSE: ${{ inputs.linkchecker_verbose }}
+        INPUT_LINKCHECKER_EXCLUDE: ${{ inputs.linkchecker_exclude }}
+        INPUT_LINKCHECKER_EXTRA_ARGS: ${{ inputs.linkchecker_extra_args }}
+      run: | # zizmor: ignore[github-env]
         echo "DATETIME=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
         echo "SCP_UPLOAD_DIR=scp_upload_$GITHUB_SHA" >> $GITHUB_ENV
-        if ${{ inputs.linkchecker_include_fragments }}; then
+        if ${INPUT_LINKCHECKER_INCLUDE_FRAGMENTS}; then
           echo "LINKCHECKER_FRAGMENTS=--include-fragments" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_FRAGMENTS=" >> $GITHUB_ENV
         fi
-        if ${{ inputs.linkchecker_offline }}; then
+        if ${INPUT_LINKCHECKER_OFFLINE}; then
           echo "LINKCHECKER_OFFLINE=--offline" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_OFFLINE=" >> $GITHUB_ENV
         fi
-        if ${{ inputs.linkchecker_verbose }}; then
+        if ${INPUT_LINKCHECKER_VERBOSE}; then
           echo "LINKCHECKER_VERBOSE=--verbose" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_VERBOSE=" >> $GITHUB_ENV
         fi
-        if [ -n "${{ inputs.linkchecker_exclude }}" ]; then
-          echo "LINKCHECKER_EXCLUDE=$(echo '${{ inputs.linkchecker_exclude }}' | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
+        if [ -n "${INPUT_LINKCHECKER_EXCLUDE}" ]; then
+          echo "LINKCHECKER_EXCLUDE=$(echo "${INPUT_LINKCHECKER_EXCLUDE}" | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_EXCLUDE=" >> $GITHUB_ENV
         fi
-        if [ -n "${{ inputs.linkchecker_extra_args }}" ]; then
-          echo "LINKCHECKER_EXTRA_ARGS=${{ inputs.linkchecker_extra_args }}" >> $GITHUB_ENV
+        if [ -n "${INPUT_LINKCHECKER_EXTRA_ARGS}" ]; then
+          echo "LINKCHECKER_EXTRA_ARGS=${INPUT_LINKCHECKER_EXTRA_ARGS}" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_EXTRA_ARGS=" >> $GITHUB_ENV
         fi
@@ -238,9 +255,9 @@ runs:
       if: env.IS_PR_CLOSED_OR_MERGED == 'true'
       shell: bash
       run: |
-        rm -rfv ${{ env.SOURCE_DIR }}
-        mkdir -p ${{ env.SOURCE_DIR }}
-        echo "This PR has been closed or merged. The preview has been removed." > ${{ env.SOURCE_DIR }}/index.html
+        rm -rfv "${SOURCE_DIR}"
+        mkdir -p "${SOURCE_DIR}"
+        echo "This PR has been closed or merged. The preview has been removed." > "${SOURCE_DIR}/index.html"
 
     # ----------------------------------------------------------------------------------------------
     # UPLOAD WEBSITE TO SERVER
@@ -248,7 +265,7 @@ runs:
     - name: Copy website files to a local subdirectory to preserve the file depth
       if: env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true'
       shell: bash
-      run: cp -r ${{ env.SOURCE_DIR }} ${{ env.SCP_UPLOAD_DIR }}
+      run: cp -r "${SOURCE_DIR}" "${SCP_UPLOAD_DIR}"
 
     - name: Upload Website to Server
       uses: appleboy/scp-action@ff85246acaad7bdce478db94a363cd2bf7c90345 # v1.0.0
@@ -272,7 +289,7 @@ runs:
       if: inputs.step_summary_enabled == 'true'
       shell: bash
       run: |
-          SUMMARY=$'# Website Deployment Summary\nDeployed production/preview website to ${{ env.URL }}'
+          SUMMARY="# Website Deployment Summary"$'\n'"Deployed production/preview website to ${URL}"
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
     - name: "Sticky Comment: Add or Update"
