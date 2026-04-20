@@ -31,8 +31,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Build website
+        env:
+          GH_REF: ${{ github.ref }}
+          GH_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           echo "Simulating build..."
           mkdir -p dist
@@ -40,7 +45,7 @@ jobs:
           <p>Hello world: <a href="https://openrailassociation.org">LINK 1</a></p>
           <p>Don't linkcheck me: <a href="https://example.com">LINK 2</a></p>
           <p>Relative link: <a href="foobar.html">LINK 3</a></p>
-          <p>${{ github.ref }}.${{ github.event.pull_request.head.sha }}</p>
+          <p>${GH_REF}.${GH_PR_HEAD_SHA}</p>
           </body></html>" > dist/index.html
           echo "baz" > dist/foobar.html
 
@@ -61,6 +66,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Call action locally
         uses: ./
         with:
