@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.2.2...v1.3.0) (2026-04-22)
+
+
+### 🚀 New Features
+
+* improve communication and documentation for PRs coming from forks ([#51](https://github.com/OpenRailAssociation/web-deployment-action/issues/51)) ([f392073](https://github.com/OpenRailAssociation/web-deployment-action/commit/f39207357342edd26b3d6aba6a46688708307e23))
+
 ## [1.2.2](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.2.1...v1.2.2) (2026-04-20)
 
 
