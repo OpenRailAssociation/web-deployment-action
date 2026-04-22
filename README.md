@@ -95,6 +95,14 @@ jobs:
 - A built website must be uploaded as an artifact in a previous job.
 - A valid SSH Private Key must be provided via repository or organization secrets. SSH passwords are not supported.
 
+## Fork PRs
+
+GitHub does not expose repository secrets to workflows triggered by pull requests from forks. As a result, the SSH key required for deployment will be unavailable and **all deployment steps are automatically skipped**. A notice is emitted in the Actions log and an explanation is written to the step summary.
+
+The link checker still runs on fork PRs — the artifact is downloaded and checked normally.
+
+This behaviour is expected and is not a failure. To trigger a deployment for a fork PR, a maintainer can manually run the workflow via `workflow_dispatch` on the contributor's branch, or push the fork branch to the base repository so the normal triggers fire with secrets available.
+
 <!-- action-docs-inputs source="action.yml" -->
 ## Inputs
 
