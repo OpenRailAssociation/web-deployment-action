@@ -54,13 +54,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6  # consider pinning hash
+      - uses: actions/checkout@v6
       # Insert here your website build process, below a boilerplate
       - name: Build Website
         run: |
           mkdir -p dist && echo "<html>Hello</html>" > dist/index.html
       # Artifact has to be uploaded. `name` has to be the action's input `artifact_name`
-      - uses: actions/upload-artifact@v7  # consider pinning hash
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.artifact_name }}
           path: dist
