@@ -21,6 +21,7 @@ You can define which conditions have to be met in order to start a productive de
 
 ## Usage
 
+<!-- x-release-please-start-version -->
 ```yaml
 name: Preview and deploy Website
 
@@ -75,7 +76,7 @@ jobs:
       pull-requests: write # required unless you explicitly set sticky_comment_enabled: false
       # deployments: write # required if gh_deployment is set
     steps:
-      - uses: OpenRailAssociation/web-deployment-action@v1 # consider pinning hash
+      - uses: OpenRailAssociation/web-deployment-action@v1.3.0
         with:
           artifact_name: ${{ env.artifact_name }}
           condition_production: ${{ github.ref == 'refs/heads/main' }}
@@ -89,6 +90,7 @@ jobs:
           dir_preview_base: preview
           dir_preview_subdir: pr-${{ github.event.number }}
 ```
+<!-- x-release-please-end -->
 
 ## Requirements
 
