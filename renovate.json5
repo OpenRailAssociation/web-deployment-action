@@ -4,6 +4,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>OpenRailAssociation/renovate-config",
-    "github>OpenRailAssociation/renovate-config:actions-pin-readme"
+    "github>OpenRailAssociation/renovate-config:actions-pin-documentation"
   ],
 }
