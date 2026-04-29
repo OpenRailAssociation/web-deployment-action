@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.3.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.3.0...v1.3.1) (2026-04-29)
+
+
+### 📦 CI Improvements
+
+* add zizmor workflow ([#55](https://github.com/OpenRailAssociation/web-deployment-action/issues/55)) ([b26121b](https://github.com/OpenRailAssociation/web-deployment-action/commit/b26121b8bd8a4a78a06e8adf9bb60166fb28ffdf))
+* restrict some workflows to only run upstream ([#58](https://github.com/OpenRailAssociation/web-deployment-action/issues/58)) ([551d30b](https://github.com/OpenRailAssociation/web-deployment-action/commit/551d30b432e76d34944a4f2a218e25316133e16c))
+
+
+### ⚙️ Chores
+
+* **config:** update renovate preset name ([debe1d9](https://github.com/OpenRailAssociation/web-deployment-action/commit/debe1d9f31aa8e3d8382dc2a57bb31a16ed87368))
+* **deps:** pin dependencies ([#57](https://github.com/OpenRailAssociation/web-deployment-action/issues/57)) ([5e70db8](https://github.com/OpenRailAssociation/web-deployment-action/commit/5e70db8c781d902810450a7e37f61ba8a641ae87))
+* **deps:** update googleapis/release-please-action action to v5 ([#53](https://github.com/OpenRailAssociation/web-deployment-action/issues/53)) ([3356619](https://github.com/OpenRailAssociation/web-deployment-action/commit/3356619bf4a17a10baf3a8f19f927ba64f0afa96))
+* improve workflow for proper version/digest in README ([#56](https://github.com/OpenRailAssociation/web-deployment-action/issues/56)) ([0aa692a](https://github.com/OpenRailAssociation/web-deployment-action/commit/0aa692a56c6797dba52b20590399a44b4a52dbf6))
+
 ## [1.3.0](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.2.2...v1.3.0) (2026-04-22)
 
 
