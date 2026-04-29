@@ -31,3 +31,7 @@ Both the PR title and merge method are required for a proper release process (se
 This project uses [release-please](https://github.com/googleapis/release-please) and its respective GitHub Action to automate the release process. This automatically creates a pull request with the version bump and changelog updates whenever a commit is pushed to the default branch. The version bump is determined by the [conventional commit messages](https://www.conventionalcommits.org/) in the commit history since the last release. Once the release pull request is merged, a new release will be published on GitHub.
 
 The relevant configuration for release-please can be found in the `.github/workflows/release-please.yaml` file and the `release-please-config.json` file. Ensure that the branch name is correctly set in the workflow file.
+
+## Change of action input/output
+
+If you change inputs or outputs of the action, you should run `npx action-docs -u` to update the documentation in the README.md file. This is required for the documentation to be up-to-date and to avoid confusion for users of the action. The `action-docs` tool extracts the relevant information from the `action.yml` file and updates the README.md accordingly.
