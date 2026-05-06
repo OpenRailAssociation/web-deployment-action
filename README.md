@@ -54,13 +54,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v1.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       # Insert here your website build process, below a boilerplate
       - name: Build Website
         run: |
           mkdir -p dist && echo "<html>Hello</html>" > dist/index.html
       # Artifact has to be uploaded. `name` has to be the action's input `artifact_name`
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v1.3.1
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ env.artifact_name }}
           path: dist
