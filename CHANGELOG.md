@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.2](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.3.1...v1.3.2) (2026-05-16)
+
+
+### 🔥 Bug Fixes
+
+* **releaser:** do not update README, renovate will do that ([d1cde48](https://github.com/OpenRailAssociation/web-deployment-action/commit/d1cde48be486d8cfc3fec14686797ecd16b81237))
+
+
+### ⚙️ Chores
+
+* **deps:** update actions/create-github-app-token action to v3.2.0 ([#62](https://github.com/OpenRailAssociation/web-deployment-action/issues/62)) ([00a171c](https://github.com/OpenRailAssociation/web-deployment-action/commit/00a171c8f7acaff0a191cb7c9a22eb62cd72381b))
+
 ## [1.3.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.3.0...v1.3.1) (2026-05-06)
 
 
