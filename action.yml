@@ -326,7 +326,7 @@ runs:
 
     - name: "Sticky Comment: Add or Update"
       if: env.IS_FORK_PR != 'true' && inputs.sticky_comment_enabled == 'true' && env.IS_PREVIEW == 'true'
-      uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
+      uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
       with:
         header: pr-preview
         message: |
@@ -337,7 +337,7 @@ runs:
 
     - name: "Sticky Comment: Remove"
       if: env.IS_FORK_PR != 'true' && inputs.sticky_comment_enabled == 'true' && env.IS_PR_CLOSED_OR_MERGED == 'true'
-      uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
+      uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
       with:
         header: pr-preview
         message: |
