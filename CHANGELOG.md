@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.0...v1.4.1) (2026-08-12)
+
+
+### ⚙️ Chores
+
+* **deps:** update actions/cache action to v6 ([#76](https://github.com/OpenRailAssociation/web-deployment-action/issues/76)) ([5677b0d](https://github.com/OpenRailAssociation/web-deployment-action/commit/5677b0d263023851fb9e553e51dbb20ee0426939))
+
 ## [1.4.0](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.3.1...v1.4.0) (2026-08-12)
 
 
