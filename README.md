@@ -133,6 +133,7 @@ This behaviour is expected and is not a failure. To trigger a deployment for a f
 | `linkchecker_retry_times` | <p>Retry delay in seconds for link checking</p> | `false` | `5` |
 | `linkchecker_fail_on_errors` | <p>Fail workflow on link check errors (true/false)</p> | `false` | `false` |
 | `linkchecker_verbose` | <p>Turn on verbose linkchecker logging in action logs (true/false)</p> | `false` | `false` |
+| `linkchecker_cache_age` | <p>Cache age for link checking (e.g. 1d), <code>0</code> disables caching</p> | `false` | `0` |
 | `linkchecker_extra_args` | <p>Extra arguments to pass to the link checker (e.g. --some-flag value)</p> | `false` | `""` |
 | `sticky_comment_enabled` | <p>Whether to enable sticky comments for the pull request. Defaults to true.</p> | `false` | `true` |
 | `step_summary_enabled` | <p>Whether to enable step summaries in the GitHub Actions UI. Defaults to true.</p> | `false` | `true` |
