@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.4.0](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.3.1...v1.4.0) (2026-08-12)
+
+
+### 🚀 New Features
+
+* add cache feature ([#75](https://github.com/OpenRailAssociation/web-deployment-action/issues/75)) ([282c206](https://github.com/OpenRailAssociation/web-deployment-action/commit/282c206b900bd4cf41f6f282b39e44fe04832d9c))
+
+
+### 🔥 Bug Fixes
+
+* **releaser:** do not update README, renovate will do that ([d1cde48](https://github.com/OpenRailAssociation/web-deployment-action/commit/d1cde48be486d8cfc3fec14686797ecd16b81237))
+
+
+### 📦 CI Improvements
+
+* harden release-please app token permissions ([#64](https://github.com/OpenRailAssociation/web-deployment-action/issues/64)) ([1f00f1e](https://github.com/OpenRailAssociation/web-deployment-action/commit/1f00f1ec578b10f9bd12880feae6f0c7d6d4802b))
+
+
+### ⚙️ Chores
+
+* **deps:** update actions/checkout action to v7.0.1 ([#72](https://github.com/OpenRailAssociation/web-deployment-action/issues/72)) ([a5cc81a](https://github.com/OpenRailAssociation/web-deployment-action/commit/a5cc81ad46223ea9fac37b2e719399eefbe6a8df))
+* **deps:** update actions/create-github-app-token action to v3.2.0 ([#62](https://github.com/OpenRailAssociation/web-deployment-action/issues/62)) ([00a171c](https://github.com/OpenRailAssociation/web-deployment-action/commit/00a171c8f7acaff0a191cb7c9a22eb62cd72381b))
+* **deps:** update github actions group ([#68](https://github.com/OpenRailAssociation/web-deployment-action/issues/68)) ([dc8b81c](https://github.com/OpenRailAssociation/web-deployment-action/commit/dc8b81c037c1cb52b5196295602d3d24f8a6e67b))
+* **deps:** update github actions group to v6.0.3 ([#66](https://github.com/OpenRailAssociation/web-deployment-action/issues/66)) ([61376dd](https://github.com/OpenRailAssociation/web-deployment-action/commit/61376ddeff3afd91095b071edab0d15caa0ecd71))
+* **deps:** update github actions group to v7 ([#67](https://github.com/OpenRailAssociation/web-deployment-action/issues/67)) ([a2608f2](https://github.com/OpenRailAssociation/web-deployment-action/commit/a2608f2aa719e596796bb572ad6d41e948073248))
+* **deps:** update lycheeverse/lychee-action action to v2.9.0 ([#70](https://github.com/OpenRailAssociation/web-deployment-action/issues/70)) ([2b32fcf](https://github.com/OpenRailAssociation/web-deployment-action/commit/2b32fcf15481845ccf8c54869ef341bdee08d817))
+* **deps:** update marocchino/sticky-pull-request-comment action to v3.0.5 ([#69](https://github.com/OpenRailAssociation/web-deployment-action/issues/69)) ([11b5e81](https://github.com/OpenRailAssociation/web-deployment-action/commit/11b5e81106826b3a420dc626faa9c00a837d9f02))
+* **deps:** update zizmorcore/zizmor-action action to v0.5.4 ([#63](https://github.com/OpenRailAssociation/web-deployment-action/issues/63)) ([a398b88](https://github.com/OpenRailAssociation/web-deployment-action/commit/a398b8829708a414a721eb14e58eb7a334814ec6))
+* **deps:** update zizmorcore/zizmor-action action to v0.5.6 ([#65](https://github.com/OpenRailAssociation/web-deployment-action/issues/65)) ([44dcdad](https://github.com/OpenRailAssociation/web-deployment-action/commit/44dcdadafa11eb4be5ee748f58a6896b58931e7b))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.0 ([#71](https://github.com/OpenRailAssociation/web-deployment-action/issues/71)) ([0582241](https://github.com/OpenRailAssociation/web-deployment-action/commit/0582241ad6ec1bc2992b0b6ad5fe843980407274))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.1 ([#73](https://github.com/OpenRailAssociation/web-deployment-action/issues/73)) ([f6db0fe](https://github.com/OpenRailAssociation/web-deployment-action/commit/f6db0fecd6cb1f4879d81b8997365da6e022f62a))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.2 ([#74](https://github.com/OpenRailAssociation/web-deployment-action/issues/74)) ([b813210](https://github.com/OpenRailAssociation/web-deployment-action/commit/b81321094a65a85884937a175ed67a5e111370c1))
+
 ## [1.3.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.3.0...v1.3.1) (2026-05-06)
 
 
