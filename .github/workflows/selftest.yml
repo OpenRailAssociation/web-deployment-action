@@ -85,5 +85,6 @@ jobs:
           linkchecker_exclude: "example.com,example.org"
           linkchecker_include_fragments: true
           linkchecker_verbose: true
+          linkchecker_cache_age: "1d"
           linkchecker_extra_args: "--index-files index.html"
           gh_deployment: "preview"

@@ -124,6 +124,11 @@ inputs:
     required: false
     default: "false"
 
+  linkchecker_cache_age:
+    description: "Cache age for link checking (e.g. 1d), `0` disables caching"
+    required: false
+    default: "0"
+
   linkchecker_extra_args:
     description: "Extra arguments to pass to the link checker (e.g. --some-flag value)"
     required: false
@@ -208,6 +213,7 @@ runs:
         INPUT_LINKCHECKER_OFFLINE: ${{ inputs.linkchecker_offline }}
         INPUT_LINKCHECKER_VERBOSE: ${{ inputs.linkchecker_verbose }}
         INPUT_LINKCHECKER_EXCLUDE: ${{ inputs.linkchecker_exclude }}
+        INPUT_LINKCHECKER_CACHE_AGE: ${{ inputs.linkchecker_cache_age }}
         INPUT_LINKCHECKER_EXTRA_ARGS: ${{ inputs.linkchecker_extra_args }}
       run: | # zizmor: ignore[github-env]
         echo "DATETIME=$(date '+%Y-%m-%d %H:%M:%S %Z')" >> $GITHUB_ENV
@@ -231,6 +237,11 @@ runs:
           echo "LINKCHECKER_EXCLUDE=$(echo "${INPUT_LINKCHECKER_EXCLUDE}" | sed 's/,/ --exclude /g; s/^/--exclude /')" >> $GITHUB_ENV
         else
           echo "LINKCHECKER_EXCLUDE=" >> $GITHUB_ENV
+        fi
+        if [ -n "${INPUT_LINKCHECKER_CACHE_AGE}" ]; then
+          echo "LINKCHECKER_CACHE_AGE=--cache --max-cache-age ${INPUT_LINKCHECKER_CACHE_AGE}" >> $GITHUB_ENV
+        else
+          echo "LINKCHECKER_CACHE_AGE=" >> $GITHUB_ENV
         fi
         if [ -n "${INPUT_LINKCHECKER_EXTRA_ARGS}" ]; then
           echo "LINKCHECKER_EXTRA_ARGS=${INPUT_LINKCHECKER_EXTRA_ARGS}" >> $GITHUB_ENV
@@ -321,8 +332,8 @@ runs:
       if: env.IS_FORK_PR != 'true' && inputs.step_summary_enabled == 'true'
       shell: bash
       run: |
-          SUMMARY="# Website Deployment Summary"$'\n'"Deployed production/preview website to ${URL}"
-          echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+        SUMMARY="# Website Deployment Summary"$'\n'"Deployed production/preview website to ${URL}"
+        echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
 
     - name: "Sticky Comment: Add or Update"
       if: env.IS_FORK_PR != 'true' && inputs.sticky_comment_enabled == 'true' && env.IS_PREVIEW == 'true'
@@ -358,6 +369,14 @@ runs:
     # ----------------------------------------------------------------------------------------------
     # LINK CHECKER
     # ----------------------------------------------------------------------------------------------
+    - name: Restore lychee cache
+      if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' || env.IS_FORK_PR == 'true') }}
+      uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+      with:
+        path: .lycheecache
+        key: cache-lychee-${{ github.sha }}
+        restore-keys: cache-lychee-
+
     - name: Run Link Checker
       if: ${{ inputs.linkchecker_enabled == 'true' && (env.IS_PRODUCTION == 'true' || env.IS_PREVIEW == 'true' || env.IS_FORK_PR == 'true') }}
       uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
@@ -369,6 +388,7 @@ runs:
           ${{ env.LINKCHECKER_OFFLINE }}
           ${{ env.LINKCHECKER_EXCLUDE }}
           ${{ env.LINKCHECKER_VERBOSE }}
+          ${{ env.LINKCHECKER_CACHE_AGE }}
           ${{ env.LINKCHECKER_EXTRA_ARGS }}
           --max-concurrency ${{ inputs.linkchecker_max_concurrency }}
           --root-dir ${{ github.workspace }}/${{ inputs.artifact_name }}
