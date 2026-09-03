@@ -69,7 +69,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Call action locally
-        uses: ./
+        uses: $/
         with:
           artifact_name: website
           condition_production: ${{ env.condition_production }}
