@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.2](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.1...v1.4.2) (2026-09-12)
+
+
+### ⚙️ Chores
+
+* **deps:** update github actions group ([#78](https://github.com/OpenRailAssociation/web-deployment-action/issues/78)) ([abdadf1](https://github.com/OpenRailAssociation/web-deployment-action/commit/abdadf1405bd2da2089c9743f3f46551d60e8fe5))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.4 ([#80](https://github.com/OpenRailAssociation/web-deployment-action/issues/80)) ([ac96526](https://github.com/OpenRailAssociation/web-deployment-action/commit/ac965262d880dda8510e05f6bca1977b77b53bd1))
+
 ## [1.4.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.0...v1.4.1) (2026-08-12)
 
 
