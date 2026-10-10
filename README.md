@@ -59,7 +59,7 @@ jobs:
         run: |
           mkdir -p dist && echo "<html>Hello</html>" > dist/index.html
       # Artifact has to be uploaded. `name` has to be the action's input `artifact_name`
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ env.artifact_name }}
           path: dist
