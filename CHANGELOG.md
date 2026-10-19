@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.2](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.1...v1.4.2) (2026-10-19)
+
+
+### ⚙️ Chores
+
+* **deps:** update actions/create-github-app-token action to v3.3.0 ([#83](https://github.com/OpenRailAssociation/web-deployment-action/issues/83)) ([dd5df69](https://github.com/OpenRailAssociation/web-deployment-action/commit/dd5df699d5879514468852b9b5ef0f6b814b4929))
+* **deps:** update dependency ubuntu to v26 ([#81](https://github.com/OpenRailAssociation/web-deployment-action/issues/81)) ([a66c792](https://github.com/OpenRailAssociation/web-deployment-action/commit/a66c792c923ce5275548ff547779b582338f5b78))
+* **deps:** update github actions group ([#78](https://github.com/OpenRailAssociation/web-deployment-action/issues/78)) ([abdadf1](https://github.com/OpenRailAssociation/web-deployment-action/commit/abdadf1405bd2da2089c9743f3f46551d60e8fe5))
+* **deps:** update github actions group ([#82](https://github.com/OpenRailAssociation/web-deployment-action/issues/82)) ([ed28e5f](https://github.com/OpenRailAssociation/web-deployment-action/commit/ed28e5fc582a461d32d05d12b7dd45b4a3df7ab7))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.4 ([#80](https://github.com/OpenRailAssociation/web-deployment-action/issues/80)) ([ac96526](https://github.com/OpenRailAssociation/web-deployment-action/commit/ac965262d880dda8510e05f6bca1977b77b53bd1))
+* **deps:** update zizmorcore/zizmor-action action to v0.7.0 ([#84](https://github.com/OpenRailAssociation/web-deployment-action/issues/84)) ([e25bfd9](https://github.com/OpenRailAssociation/web-deployment-action/commit/e25bfd94815a0d9a407e829b9b1c0f11ed9cc234))
+* **deps:** update zizmorcore/zizmor-action action to v0.7.1 ([#85](https://github.com/OpenRailAssociation/web-deployment-action/issues/85)) ([728187a](https://github.com/OpenRailAssociation/web-deployment-action/commit/728187a7577760eb8cfeb8c7742f95ef634037db))
+
 ## [1.4.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.0...v1.4.1) (2026-08-12)
 
 
