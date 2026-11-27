@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.2](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.1...v1.4.2) (2026-11-27)
+
+
+### ⚙️ Chores
+
+* **deps:** update actions/create-github-app-token action to v3.3.0 ([#83](https://github.com/OpenRailAssociation/web-deployment-action/issues/83)) ([dd5df69](https://github.com/OpenRailAssociation/web-deployment-action/commit/dd5df699d5879514468852b9b5ef0f6b814b4929))
+* **deps:** update actions/create-github-app-token action to v3.4.0 ([#88](https://github.com/OpenRailAssociation/web-deployment-action/issues/88)) ([e684f74](https://github.com/OpenRailAssociation/web-deployment-action/commit/e684f74695da77fea47dd22c5f10f9605a1e1f94))
+* **deps:** update dependency ubuntu to v26 ([#81](https://github.com/OpenRailAssociation/web-deployment-action/issues/81)) ([a66c792](https://github.com/OpenRailAssociation/web-deployment-action/commit/a66c792c923ce5275548ff547779b582338f5b78))
+* **deps:** update github actions group ([#78](https://github.com/OpenRailAssociation/web-deployment-action/issues/78)) ([abdadf1](https://github.com/OpenRailAssociation/web-deployment-action/commit/abdadf1405bd2da2089c9743f3f46551d60e8fe5))
+* **deps:** update github actions group ([#82](https://github.com/OpenRailAssociation/web-deployment-action/issues/82)) ([ed28e5f](https://github.com/OpenRailAssociation/web-deployment-action/commit/ed28e5fc582a461d32d05d12b7dd45b4a3df7ab7))
+* **deps:** update zizmorcore/zizmor-action action to v0.6.4 ([#80](https://github.com/OpenRailAssociation/web-deployment-action/issues/80)) ([ac96526](https://github.com/OpenRailAssociation/web-deployment-action/commit/ac965262d880dda8510e05f6bca1977b77b53bd1))
+* **deps:** update zizmorcore/zizmor-action action to v0.7.0 ([#84](https://github.com/OpenRailAssociation/web-deployment-action/issues/84)) ([e25bfd9](https://github.com/OpenRailAssociation/web-deployment-action/commit/e25bfd94815a0d9a407e829b9b1c0f11ed9cc234))
+* **deps:** update zizmorcore/zizmor-action action to v0.7.1 ([#85](https://github.com/OpenRailAssociation/web-deployment-action/issues/85)) ([728187a](https://github.com/OpenRailAssociation/web-deployment-action/commit/728187a7577760eb8cfeb8c7742f95ef634037db))
+* **deps:** update zizmorcore/zizmor-action action to v0.8.0 ([#86](https://github.com/OpenRailAssociation/web-deployment-action/issues/86)) ([6a7c166](https://github.com/OpenRailAssociation/web-deployment-action/commit/6a7c16691ab18478b5a5711a3f789d93e0ec8757))
+* **deps:** update zizmorcore/zizmor-action action to v0.8.1 ([#87](https://github.com/OpenRailAssociation/web-deployment-action/issues/87)) ([0068d5b](https://github.com/OpenRailAssociation/web-deployment-action/commit/0068d5b28864345fa1eed09f07696177ca0a4313))
+* **deps:** update zizmorcore/zizmor-action action to v0.9.1 ([#89](https://github.com/OpenRailAssociation/web-deployment-action/issues/89)) ([a8fdd1a](https://github.com/OpenRailAssociation/web-deployment-action/commit/a8fdd1a5a064c8504f7c9b3e4384ab62dd3a9c12))
+* **deps:** update zizmorcore/zizmor-action action to v0.9.2 ([#90](https://github.com/OpenRailAssociation/web-deployment-action/issues/90)) ([38f86d7](https://github.com/OpenRailAssociation/web-deployment-action/commit/38f86d787e503fd9135334af1df3f13f7d8b4280))
+
 ## [1.4.1](https://github.com/OpenRailAssociation/web-deployment-action/compare/v1.4.0...v1.4.1) (2026-08-12)
 
 
